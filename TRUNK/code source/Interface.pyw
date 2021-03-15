@@ -1,22 +1,16 @@
-# coding: utf-8
- 
-from tkinter import * 
+import sys
+from PyQt5.QtWidgets import QApplication, QWidget
 
-#Création de la fenêtre de TKinter
-window = Tk()
+app = QApplication.instance() 
+if not app: 
+    app = QApplication(sys.argv)
 
-#Personnalisation de la fenêtre
-window.title("Données des robots")
-window.geometry("480x320")
-window.config(background='green')
-window.resizable(width=0, height=0)
 
-#Création de frame (boîte)
-frame = Frame()
+window = QWidget()
+window.setWindowTitle("Coach Interface")
+window.resize(1000,700)
 
-#Ajout de texte
-texte = Label(window, text="On devra mettre en entrée les données des robots", )
-texte.pack() 
 
-#Affiche la fenêtre
-window.mainloop()
+window.show()
+
+app.exec_()

@@ -3,17 +3,17 @@
 #------------------------#
 
 class Robot:
-    """ classe definissant chaque robot
+    """ 
+    class define every robot
     """
+	captain = false
 
     def __init__(self):
-    	# le robot essaye de se connecter au serveur
-    	self.captain = false
+    	# robot try to connect to the server
+    	
 
 
-    def connexion(ip):
+    def connexion(self,ip):
     	""" 
     	allows robot to connect to the server
     	"""
-
-    def calculDistance()
