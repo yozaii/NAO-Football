@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys
-
+import argparse
 from naoqi import ALProxy
 IP = "169.254.145.67"
 PORT = 9559
@@ -18,8 +18,15 @@ except Exception, e:
     print "Could not create proxy to ALRobotPosture"
     print "Error was: ", e
 
-motionProxy.moveTo(1.0, 0.0, 0.0)
+try:
+    talkProxy = ALProxy("ALTextToSpeech",IP,PORT)
+except Exception, e:
+    print "Could not create proxy to ALTextToSpeech"
+    print "Error was: ", e    
 
+motionProxy.wakeUp()
+talkProxy.setLanguage("French")
+talkProxy.say("Bon, c'est partie.")
 
 def shoot():
     """
@@ -30,14 +37,15 @@ def get_up():
     """
     Nao get up.
     """
-   #motionProxy.moveInit()
+   motionProxy.moveInit()
+   motionProxy.goToPosture("StandInit", 0.4)
 
 def walk():
     """
     The robot walk.
     """
-    #motionProxy.moveInit()
-    #motionProxy.moveTo(0.5, 0, 0)
+    motionProxy.moveInit()
+    motionProxy.moveTo(0.5, 0, 0)
 
 def turn():
     """
@@ -47,7 +55,7 @@ def standby():
     """
     The robot stay and do nothing.
     """
-    #postureProxy.stopMove()
+    postureProxy.stopMove()
 
 def to_place():
     """
@@ -57,3 +65,13 @@ def danse():
     """
     Make the robot danse.
     """
+    postureProxy.goToPosture("StandInit", 0.5)
+    footStepsList = [] 
+    # 1) Step forward with your left foot
+    footStepsList.append([["LLeg"], [[0.06, 0.1, 0.0]]])
+    # 2) Sidestep to the left with your left foot
+    footStepsList.append([["LLeg"], [[0.00, 0.16, 0.0]]])
+    # 3) Move your right foot to your left foot
+    footStepsList.append([["RLeg"], [[0.00, -0.1, 0.0]]])
+    # 4) Sidestep to the left with your left foot
+    footStepsList.append([["LLeg"], [[0.00, 0.16, 0.0]]])
