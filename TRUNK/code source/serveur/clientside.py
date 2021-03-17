@@ -48,5 +48,5 @@ def envoyer_message(message=""):
     client.send(msg)
     print(client.recv(1024).decode("utf8"))
 
-envoyer_message("Salut les gars !")
+envoyer_message(socket.gethostbyname(socket.gethostname()))
 envoyer_message(MESSAGE_DECONNECTION)
