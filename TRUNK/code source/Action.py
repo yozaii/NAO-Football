@@ -2,7 +2,7 @@
 import sys
 import argparse
 from naoqi import ALProxy
-IP = "169.254.145.67"
+IP = "169.254.202.68"
 PORT = 9559
 
 # Create a proxy to ALMotion.
