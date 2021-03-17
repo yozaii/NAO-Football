@@ -1,12 +1,13 @@
 # coding: utf-8
 import select
 import socket
-
+import threading
+"""
 #Permet d'ouvrir une connexion avec une machine local/distante
 ouvrir_connexion_avec_clients = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 #Nom d'hôte et de port afin de connecter notre socket
-hote = ''
+hote = 'localhost'
 port = 10000 #ceux entre 0 et 1023 sont réservé au système
 ouvrir_connexion_avec_clients.bind((hote, port)) #connecte notre socket
 
@@ -43,15 +44,61 @@ while serveur_est_lance:
             # Client est de type socket
             msg_recu = client.recv(1024)
             # Peut planter si le message contient des caractères spéciaux
-            msg_recu = msg_recu.decode()
+            msg_recu = msg_recu.decode("utf8")
             print("Reçu {}".format(msg_recu))
             client.send(b"5 / 5")
             if msg_recu == "fin":
-                client.close()
                 print("un client c'est déco")
-                #serveur_est_lance = False
+                serveur_est_lance = False
 
 print("Fermeture des connexions")
 for client in clients_connectes:
     client.close()
 ouvrir_connexion_avec_clients.close()
+"""
+#-----------------------------------------------------------------------------------------------
+
+hote = socket.gethostbyname(socket.gethostname())
+print(socket.gethostname())
+print(hote)
+port = 10000
+serveur = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+serveur.bind((hote, port))
+HEADER = 64
+
+def connexion_client(socket_client=None, adresse_client=None):
+
+    print(f"{adresse_client} c'est connecté !")
+    est_connecte = True
+
+    while est_connecte:
+        taille_msg = socket_client.recv(HEADER).decode("utf8")
+        if taille_msg:
+            taille_msg = int(taille_msg)
+            msg = socket_client.recv(taille_msg).decode("utf8")
+            print(f"{adresse_client} a envoyé : {msg}")
+            if msg == "fin":
+                est_connecte = False
+                socket_client.send("Je te déconnecte".encode("utf8"))
+            else:
+                socket_client.send("J'ai bien reçu ton message".encode("utf8"))
+    
+    socket_client.close()
+
+def envoyer_message():
+    """
+        On envoie un message d'un autre client
+    """
+
+def lancer():
+    #sockets_lu = []
+    print("[DEMMARAGE] LE SERVEUR A ÉtÉ LANCÉ")
+    serveur.listen(5)
+    print(f"[ÉCOUTE] LE SERVEUR ÉCOUTE A L'ADRESSE {hote, port}")
+    while True:
+        #sockets_lu, sockets_ecrit, sockets_erreur = select.select([serveur], [], [], 0.1)
+        socket_client, adresse_client = serveur.accept()
+        thread_connexion = threading.Thread(target=connexion_client, args=(socket_client, adresse_client))
+        thread_connexion.start()
+        
+lancer()
