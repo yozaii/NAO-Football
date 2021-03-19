@@ -39,7 +39,7 @@ class NAOVision :
 
 
 
-    def _subscribeToVideoProxy(self, cameraID):
+    def _subscribeToImageClient(self, cameraID):
         """
         Register our video module(_imgCLient) to the robot.
         """
@@ -52,7 +52,7 @@ class NAOVision :
         #fps (last argument)
         self._imgClient = self._videoProxy.subscribe("_client", cameraID,  resolution, colorSpace, 5)
 
-    def _unregisterImageClient(self):
+    def _unsubscribeToImageClient(self):
         """
         Unregister our naoqi video module (_imgClient)
         """
