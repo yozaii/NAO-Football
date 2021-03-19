@@ -1,50 +1,61 @@
 #------------------------#
 #    Enumeration/node    #
 #------------------------#
-from enum import Enum
+from enum import Enum, auto
 
 
 class Role(Enum):
     """
     player role
     """
-    GOAL = 1
-    RDEFENSE = 2
-    LDEFENSE = 3
-    RATTACKER = 4
-    LATTACKER = 5
-    MIDDLE = 6
+
+    GOAL = auto()
+    RDEFENSE = auto()
+    LDEFENSE = auto()
+    RATTACKER = auto()
+    LATTACKER = auto()
+    MIDDLE = auto()
 
 
 class Element(Enum):
     """
     Element of court
     """
-    BALL = 1
-    ALLY = 2
-    ENEMY = 3
-    CAGES = 4
+    BALL = auto()
+    ALLY = auto()
+    ENEMY = auto()
+    CAGES = auto()
 
 class Strategy(Enum):
     """
     game strategy
     """
-    DEFAULT = 1
-    ULTRA_OFFENSE = 2
-    ULTRA_DEFENSE = 3
+    DEFAULT = auto()
+    ULTRA_OFFENSE = auto()
+    ULTRA_DEFENSE = auto()
 
 class Point3D:
     """
     3d point
     Argument:
-    x --
-    y -- 
-    z -- 
+    x -- x coordonnee
+    y -- y coordonnee
+    z -- z coordonnee
     """
     def __init__(self,x,y,z):
         self.__x = x
         self.__y = y
         self.__z = z
+
+    def distance(self,posE1,posE2):
+        """
+        allows to calculate the distance between two point3D
+        Argument:
+        posE1 -- Position (Point3D) of the element 1
+        posE2 -- Position (Point3D) of the element 2
+        """
+
+        return sqrt(pow(posE2.get_x() - posE1.get_x() ,2) + pow(posE2.get_y() - posE1.get_y() ,2))
 
     def get_x(self):
         return self.__x
@@ -81,6 +92,33 @@ class AffineFunction:
         self.__a = (self.__yb - self.__ya) / (self.__xb - self.__xa)
         self.__b = self.__ya - (self.__a * self.__xa)
 
+    def bestFunction(self,f,g,h,i):
+        """
+        return the distance between two function
+        Argument:
+        f -- affine Function
+        g -- affine Function
+        h -- affine Function
+        i -- affine Function
+        """
+        pf.set_y(f.get_y(0))
+        pf.set_x(0)
+
+        pg.set_y(f.get_y(0))
+        pg.set_x(0)
+
+        ph.set_y(f.get_y(0))
+        ph.set_x(0)
+
+        pi.set_y(f.get_y(0))
+        pi.set_x(0)
+
+
+        if distance(pf,pi) <= distance(pg,ph):
+            return [g,h]
+        else: return [f,i]
+
+
     def get_a(self):
         return self.__a
 
@@ -92,4 +130,30 @@ class AffineFunction:
 
     def get_y(self,x):
         return self.__a*x + self.__b 
+
+class PerimeterSquare:
+    def __init__(self,pos):
+        self.__pos = pos
+        self.__topLeft.set_y(pos.get_y()+1)
+        self.__topLeft.set_x(pos.get_x()-1)
+        self.__topRight.set_y(pos.get_y()+1)
+        self.__topRight.set_x(pos.get_x()+1)
+        self.__botLeft.set_y(pos.get_y()-1)
+        self.__botLeft.set_x(pos.get_x()-1)
+        self.__botRight.set_y(pos.get_y()-1)
+        self.__botRight.set_x(pos.get_x()+1)
+
+    def get_topLeft(self):
+        return self.__topLeft
+
+    def get_topRight(self):
+        return self.__topRight
+
+    def get_botLeft(self):
+        return self.__botLeft
+
+    def get_botRight(self):
+        return self.__botRight
+
+
 
