@@ -9,7 +9,7 @@ import vision_definitions
 
 class NAOVision :
 
-    def __init__ ( self, IP, PORT, CameraID) :
+    def __init__ ( self, IP, PORT) :
         """
         Constructor
         :param IP: Ip of NAO Network
@@ -22,10 +22,12 @@ class NAOVision :
         self._port = PORT
 
         # Proxy to ALVideoDevice
-        self._videoProxy = None
+        self._videoProxyTop = None
+        self._videoProxyBottom = None
 
         # Videomodule name.
-        self._imgClient = ""
+        self._imgClientTop = ""
+        self._imgClientBottom = ""
 
         # Image dimensions and parameters
         self._imgWidth = 320
@@ -39,9 +41,11 @@ class NAOVision :
 
 
 
-    def _subscribeToImageClient(self, cameraID):
+    def _subscribeToVideoProxy(self, cameraID):
         """
-        Register our video module(_imgCLient) to the robot.
+        Register our video module to the robot
+        cameraID = 0, uses the top camera
+        cameraID = 1, uses the bottom camera
         """
         self._videoProxy = ALProxy("ALVideoDevice", self._ip, self._port)
         resolution = vision_definitions.kQVGA  # 320 * 240
@@ -50,21 +54,35 @@ class NAOVision :
         #"_client" : name of handler (1st argument)
         #cameraID: 0 for bottom, 1 for top (2nd argument)
         #fps (last argument)
-        self._imgClient = self._videoProxy.subscribe("_client", cameraID,  resolution, colorSpace, 5)
+        if (cameraID == 0):
+            self._imgClientTop = self._videoProxyTop.subscribe("_clientTop", cameraID,  resolution, colorSpace, 5)
+        elif (cameraID == 1)
+            self._imgClientBottom = self._videoProxyBottom.subscribe("_clientBottom", cameraID,  resolution, colorSpace, 5)
 
-    def _unsubscribeToImageClient(self):
+    def _unsubscribeToVideoProxy(self, cameraID):
         """
-        Unregister our naoqi video module (_imgClient)
+        Unregister our naoqi video module
+        cameraID = 0, unsubscribes from the top camera
+        cameraID = 1, unsubscribes from the bottom camera
         """
-        if self._imgClient != "":
-            self._videoProxy.unsubscribe(self._imgClient)
+        if (cameraID == 0):
+            if self._imgClientTop != "":
+                self._videoProxyTop.unsubscribe(self._imgClient)
+        elif (cameraID == 1):
+            if self._imgClientBottom != "":
+                self._videoProxyBottom.unsubscribe(self._imgClient)
 
-    def _takeImage(self):
+    def _takeImage(self, cameraID):
         """
-        Retrieve a new image from Nao.(incomplete)
+        Retrieves a new image from Nao
         """
-        self._alImage = self._videoProxy.getImageRemote(self._imgClient)
-
+        if (cameraID == 0):
+            self._alImage = self._videoProxyTop.getImageRemote(self._imgClient)
+        elif (cameraID == 0):
+            self._alImage = self._videoProxyBottom.getImageRemote(self._imgClient)
         #still needs work to get proper dimensions
-        self._image = np.append(self._alImage[6])
+        self._image.data = self._alImage[6]
         return self._image
+
+if __name__ == "__main__":
+    print(1)

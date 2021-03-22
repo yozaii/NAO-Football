@@ -17,13 +17,14 @@ class ImageProcessing :
             infoList[3] = length of rectangle
             infoList[4] = x of center of rectangle
             infoList[5] = y of center of rectangle
+            infoList[6] = center of rectangle
 
         """
         #showing source image
         cv2.imshow('source',img)
 
         #the classifier from xml file
-        ball_cascade = cv2.CascadeClassifier(xml)
+        ball_cascade = cv2.CascadeClassifier(xmlfile)
 
         #source img converted to grayscale
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -43,7 +44,7 @@ class ImageProcessing :
         cv2.destroyAllWindows()
 
         #returns coordinates in result image
-        infoList = [None] * 6
+        infoList = [None] * 7
 
         #x of topleft of rectangle
         infoList[0] = balls[0][0]
@@ -54,20 +55,32 @@ class ImageProcessing :
         #rectangle height
         infoList[3] = balls[0][3]
         #x of rectangle center
-        infoList[4] = balls[0][0] + balls[0][2]
+        infoList[4] = balls[0][0] + balls[0][2]/2
         #y of rectangle center
-        infoList[5] = balls[0][1] + balls[0][3]
+        infoList[5] = balls[0][1] + balls[0][3]/2
+        #area of rectangle
+        infoList[6] = balls[0][2]*balls[0][3]
 
         return infoList
 
 
 
-"""Temporary tests here"""
+if __name__ == "__main__":
 
-img = cv2.imread('C:\\Users\\Youssef\\Desktop\\Robocup Images\\1.jpg',6)
-xml = 'C:\\Users\\Youssef\\Downloads\\ball_cascade.xml'
+    img = cv2.imread('C:\\Users\\Youssef\\Desktop\\Robocup Images\\1.jpg',6)
+    xml = 'C:\\Users\\Youssef\\Downloads\\ball_cascade.xml'
+    img2 = cv2.imread('C:\\Users\\Youssef\\Desktop\\Robocup Images\\3.jpg',6)
+    output = cv2.resize(img, (320, 240))
+    output2 = cv2.resize(img2,(320,240))
 
+    ImPr = ImageProcessing()
+    thelist = ImPr.findBallRectangle(output,xml)
 
-ImPr = ImageProcessing()
-thelist = ImPr.findBallRectangle(img,xml)
-print(thelist)
+    print(img.shape)
+    print(output.shape)
+    cv2.imshow('now',output)
+    print(thelist)
+    cv2.imshow('before',output)
+    output.data = output2.data
+    cv2.imshow('after',output2)
+    cv2.waitKey()
