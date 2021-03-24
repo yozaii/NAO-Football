@@ -5,7 +5,7 @@ from ImageProcessing import ImageProcessing as ImPr
 import time
 import unittest
 
-IP = '168.1.1.1'
+IP = '172.27.96.32'
 PORT = 9559
 
 class Analyse :
@@ -70,7 +70,7 @@ class TestAnalyse(unittest.TestCase):
         self.assertEqual(10,analyse._updateBallGridLocation(233, 172))
 
 if __name__ == "__main__":
-    unittest.main()
+    #unittest.main()
 
     #Other tests below:
     """Testing updateBallCoordinates
@@ -82,9 +82,18 @@ if __name__ == "__main__":
     print(analyse._getBallCoordinates())
     print(time.time()-times)"""
 
-    """
+
     #Testing imageCapture on top camera
+    xml = 'C:\\Users\\Youssef\\Downloads\\ball_cascade.xml'
+    analyse = Analyse('172.27.96.32', 9559)
+    print(analyse._vision._videoProxy)
     analyse._vision._subscribeToVideoProxy(0)
+    print(analyse._vision._imgClientTop)
+    print(analyse._vision._videoProxy)
     naoimg = analyse._vision._takeImage(0)
-    cv2.imshow('NAOImage',naoimg)
-    analyse._vision._unsubscribeToVideoProxy(0)"""
+    analyse._updateBallCoordinates(naoimg, xml)
+    print(analyse._ballCoordinates)
+    print(analyse._ballGridLocation)
+    #cv2.imshow('NAOImage',naoimg)
+    #cv2.waitKey()
+    #cv2.destroyAllWindows()

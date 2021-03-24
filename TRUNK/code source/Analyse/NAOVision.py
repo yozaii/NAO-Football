@@ -7,8 +7,6 @@ from naoqi import ALProxy
 import vision_definitions
 import unittest
 
-IP = '168.1.1.1'
-PORT = 9559
 
 class NAOVision :
 
@@ -67,19 +65,19 @@ class NAOVision :
         """
         if (cameraID == 0):
             if self._imgClientTop != "":
-                self._videoProxyTop.unsubscribe(self._imgClient)
+                self._videoProxy.unsubscribe(self._imgClientTop)
         elif (cameraID == 1):
             if self._imgClientBottom != "":
-                self._videoProxyBottom.unsubscribe(self._imgClient)
+                self._videoProxy.unsubscribe(self._imgClientBottom)
 
     def _takeImage(self, cameraID):
         """
         Retrieves a new image from Nao
         """
         if (cameraID == 0):
-            self._alImage = self._videoProxyTop.getImageRemote(self._imgClient)
-        elif (cameraID == 0):
-            self._alImage = self._videoProxyBottom.getImageRemote(self._imgClient)
+            self._alImage = self._videoProxy.getImageRemote(self._imgClientTop)
+        elif (cameraID == 1):
+            self._alImage = self._videoProxy.getImageRemote(self._imgClientBottom)
         #still needs work to get proper dimensions
         self._image.data = self._alImage[6]
         return self._image
@@ -133,4 +131,11 @@ if __name__ == "__main__":
     print(nVis._image.shape == (240L, 320L, 3L))
     """
 
-
+    """
+    nVis = NAOVision(IP,9559)
+    nVis._subscribeToVideoProxy(1)
+    naoimg = nVis._takeImage(1)
+    print(nVis._videoProxy)
+    print(nVis._imgClientTop + 'Test')
+    nVis._unsubscribeToVideoProxy(0)
+    """
