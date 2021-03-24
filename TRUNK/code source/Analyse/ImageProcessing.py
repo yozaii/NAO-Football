@@ -1,6 +1,10 @@
 from cv2 import cv2
 import numpy as np
 import math
+import unittest
+
+img = cv2.imread('C:\\Users\\Youssef\\Desktop\\Robocup Images\\1.jpg', 6)
+xml = 'C:\\Users\\Youssef\\Downloads\\ball_cascade.xml'
 
 class ImageProcessing :
 
@@ -63,24 +67,23 @@ class ImageProcessing :
 
         return infoList
 
+class TestImageProcessing(unittest.TestCase):
 
+    """
+    tests if the list returned by findBallRectangle returns
+    a list of size 7
+    """
+    def testReturnFindBallRectangleSize(self):
+        ImPr = ImageProcessing()
+        self.assertEqual(len(ImPr.findBallRectangle(img, xml)), 7)
+
+    def testRandom(self):
+        self.assertEqual(1,1)
 
 if __name__ == "__main__":
+    #unittest.main()
 
-    img = cv2.imread('C:\\Users\\Youssef\\Desktop\\Robocup Images\\1.jpg',6)
-    xml = 'C:\\Users\\Youssef\\Downloads\\ball_cascade.xml'
-    img2 = cv2.imread('C:\\Users\\Youssef\\Desktop\\Robocup Images\\3.jpg',6)
-    output = cv2.resize(img, (320, 240))
-    output2 = cv2.resize(img2,(320,240))
-
-    ImPr = ImageProcessing()
-    thelist = ImPr.findBallRectangle(output,xml)
-
-    print(img.shape)
+    #Other tests below:
+    dim = (320,240)
+    output = cv2.resize(img, dim)
     print(output.shape)
-    cv2.imshow('now',output)
-    print(thelist)
-    cv2.imshow('before',output)
-    output.data = output2.data
-    cv2.imshow('after',output2)
-    cv2.waitKey()
