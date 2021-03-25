@@ -79,10 +79,10 @@ class AffineFunction:
     """
     Affine function
     Argument:
-    a -- director coefficient
-    b -- ordered at the origin
+    a -- point of courbe
+    b -- point of courbe
     """
-    def __init__(self,a,b)
+    def __init__(self,a,b):
         self.__xa = a.get_x()
         self.__xb = b.get_x()
 
@@ -91,6 +91,7 @@ class AffineFunction:
 
         self.__a = (self.__yb - self.__ya) / (self.__xb - self.__xa)
         self.__b = self.__ya - (self.__a * self.__xa)
+
 
     def bestFunction(self,f,g,h,i):
         """
@@ -154,6 +155,3 @@ class PerimeterSquare:
 
     def get_botRight(self):
         return self.__botRight
-
-
-

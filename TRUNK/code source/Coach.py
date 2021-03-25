@@ -1,31 +1,28 @@
 #------------------------#
 #     Classes Coach      #
 #------------------------#
-
-from math import *
+# -*- coding: utf-8 -*-
+import math
+import random
 from Node import *
+
 class Coach:
     """ 
     class who dictates who need to do what and making decision about the game
     Argument:
     Variable:
     """
-
-    role = list(Role)
-    strat = Strategy.DEFAULT
-
-
     def __init__(self):
-        if strat == Strategy.DEFAULT:
-            role.remove(Role.MIDDLE)
+
+        self.__role = list(Role)
+        self.strat = Strategy.DEFAULT
 
     def distribRole(self):
         """
         allows to give a role to the robot
         """
-
-        choice = random.choice(role)
-        role.remove(choice)
+        choice = random.choice(self.__role)
+        self.__role.remove(choice)
         return choice
 
     def isPresent(self,f,g,posElement):
@@ -34,14 +31,37 @@ class Coach:
         Argument:
         f -- Function which corresponds to one of the external lines between two robots
         g -- Function which corresponds to one of the external lines between two robots
-        posElement -- Position (Point3D) of the element C
+        posElement -- Position (Point3D) of the element posElement
         """
-
-        # we verify if the point C is between the function f and g
-        if posElement.get_y() <= f.get_y(posElement.get_x()) and posElement.get_y() >= g.get_y(posElement.get_x()) and posElement.get_x() <= f.get_x(posElement.get_y()) and posElement.get_x() >= g.get_x(posElement.get_y()):
-            return true
+        # determinate the f and g to the function isPresent
+        if f.get_y(posElement.get_x()) >= g.get_y(posElement.get_x()):
+            self.f = f
+            self.g = g
+        
         else:
-            return false
+            self.f = g
+            self.g = f
+
+        # determinate the case
+        if self.f.get_x(posElement.get_y()) >= self.g.get_x(posElement.get_y()):
+            yCase = posElement.get_y() <= self.f.get_y(posElement.get_x()) and posElement.get_y() >= self.g.get_y(posElement.get_x())
+            xCase = posElement.get_x() <= self.f.get_x(posElement.get_y()) and posElement.get_x() >= self.g.get_x(posElement.get_y())
+        else:
+            yCase = posElement.get_y() <= self.f.get_y(posElement.get_x()) and posElement.get_y() >= self.g.get_y(posElement.get_x())
+            xCase = posElement.get_x() >= self.f.get_x(posElement.get_y()) and posElement.get_x() <= self.g.get_x(posElement.get_y())
+
+        horizontalCase = posElement.get_x() == self.f.get_x(posElement.get_y()) and posElement.get_x() == self.g.get_x(posElement.get_y())
+        verticalCase = posElement.get_y() == self.f.get_y(posElement.get_x()) and posElement.get_y() == self.g.get_y(posElement.get_x())
+        
+        
+
+        if horizontalCase and yCase:
+            return True
+        elif verticalCase and xCase:
+            return True
+        elif xCase and yCase:
+            return True
+        else: return False
 
     def theClosest(self,posElement,listRobot):
         """
@@ -84,3 +104,67 @@ class Coach:
             
 
         # doit retourner la liste des robots à qui je peux faire la passe
+    
+    def get_role(self):
+        return self.__role
+
+
+#******************     TEST Coach/Node    *********************#
+
+import unittest
+class test(unittest.TestCase):
+
+    def setUp(self):
+        self.oumar = Coach()
+        self.posElement = Point3D(1,2,0)
+        # case 7-3
+        self.f = AffineFunction(Point3D(-1,-2,0),Point3D(1,4,0))
+        self.g = AffineFunction(Point3D(1,-3,0),Point3D(3,2,0))
+        # case 1-5
+        self.h = AffineFunction(Point3D(-3,2,0),Point3D(3,-2,0))
+        self.i = AffineFunction(Point3D(-1,4,0),Point3D(5,0,0))
+
+    def testIsPresent1(self):
+        """
+        test the function isPresent with case 7-3
+        """
+        self.assertTrue(self.oumar.isPresent(self.f,self.g,self.posElement))
+
+    def testIsPresent2(self):
+        """
+        test the function isPresent with case 1-5
+        """
+        self.assertTrue(self.oumar.isPresent(self.i,self.h,self.posElement))
+
+    def testAffineFunction1(self):
+        """
+        test the a on: ax +b
+        """
+        self.assertEqual(self.f.get_a(),3)
+
+    def testAffineFunction2(self):
+        """
+        test the b on: ax +b
+        """
+        self.assertEqual(self.f.get_b(),1)
+
+
+
+def testDistribRole(oumar):
+    """
+    test if all role are distributed
+    """
+
+    print("test of dirstribRole() function")
+    for i in range(6):
+        oumar.distribRole()
+    if len(oumar.get_role()) == 0:
+        return print("success")
+    else:
+        return print("failure")
+
+
+if __name__ == '__main__':
+    testDistribRole(Coach())
+    unittest.main()
+    
