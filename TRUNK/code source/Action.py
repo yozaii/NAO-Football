@@ -63,6 +63,7 @@ def lSideShoot(postureProxy, motionProxy):
     postureProxy.goToPosture("StandInit", 2)
     motionProxy.moveTo(0, 0.02, 0)
     motionProxy.moveInit()
+
 def rSideShoot(postureProxy, motionProxy):
     motionProxy.moveInit()
     postureProxy.goToPosture("StandInit", 2)
@@ -127,6 +128,16 @@ def standby(postureProxy):
     The robot stay and do nothing.
     """
     postureProxy.stopMove()
+
+def lookAround(motionProxy):
+    """
+    The robot looks right and left to scan the field"
+    """
+    name = "HeadYaw"
+    motionProxy.setStiffnesses(name, 1)
+    angleLists = [-2.0857, 2.0857]
+    timeLists = [2.5, 5.0]
+    self.motion.post.angleInterpolation(name, angleLists, timeLists, True)
 
 
 def danse(postureProxy, motionProxy):

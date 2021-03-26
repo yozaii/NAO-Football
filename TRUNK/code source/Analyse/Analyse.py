@@ -19,12 +19,19 @@ class Analyse :
         #ball's center is (values between 0 -> 15 inclusive)
         self._ballGridLocation = None
 
+        #Ball area as perceived by the camera
+        self._ballArea
+
         self._vision = NVis(IP, PORT)
         self._imPr = ImPr()
 
-    def _updateBallCoordinates(self, img, xml):
+        #Connects to top and bottom video cameras
+        self._vision._subscribeToVideoProxy(0)
+        self._vision._subscribeToVideoProxy(1)
+
+    def _updateBallInfo(self, img, xml):
         """
-        This function updates the value of ballCoordinates by using
+        This function updates the value of all ball related attributes by using
         the ImageProcessing function findBallRectangle()
         :param img:
         :param xml:
@@ -32,11 +39,23 @@ class Analyse :
         """
         ballInfo = self._imPr.findBallRectangle(img,xml)
 
-        #ballInfo[4] corresponds to x of center of ball
-        #ballinfo[5] corresponds to y of center of ball
-        self._ballCoordinates[0] = ballInfo[4]
-        self._ballCoordinates[1] = ballInfo[5]
-        self._updateBallGridLocation(self._ballCoordinates[0], self._ballCoordinates[1])
+        #If no ball is detected
+        if (len(ballInfo)<1):
+            self._ballCoordinates[0]= -1
+            self._ballCoordinates[0]= -1
+            self._ballArea = -1
+            self._ballGridLocation = -1
+
+        #If ball is detected
+        else :
+            #ballInfo[4] corresponds to x of center of ball
+            #ballinfo[5] corresponds to y of center of ball
+            #ballInfo[6] corresponds to the area of the ball
+            self._ballCoordinates[0] = ballInfo[4]
+            self._ballCoordinates[1] = ballInfo[5]
+            self._ballArea = ballInfo[6]
+            self._updateBallGridLocation(self._ballCoordinates[0], self._ballCoordinates[1])
+
 
     def _updateBallGridLocation(self, x, y):
         """
@@ -54,11 +73,32 @@ class Analyse :
 
         return (xx + 4*(yy))
 
+    def _takeTopImage(self, xml):
+        """
+        Takes an image using the top camera
+        and updates ball information accordingly
+        """
+        img = self._vision._takeImage(0)
+        self._updateBallInfo(img, xml)
+
+    def _takeBottomImage(self,img,xml):
+        """
+        Takes an image using the top camera
+        and updates ball information accordingly
+        """
+        img = self._vision._takeImage(1)
+        self._updateBallInfo(img, xml)
+
     def _getBallCoordinates(self):
         return self._ballCoordinates
 
-    def _getVision(self):
-        return self._vision
+    def _getBallArea(self):
+        return self._ballArea
+
+    def _getBallGridLocation(self):
+        return self._ballGridLocation
+
+
 
 class TestAnalyse(unittest.TestCase):
 
@@ -68,6 +108,8 @@ class TestAnalyse(unittest.TestCase):
         """
         analyse = Analyse(IP,PORT)
         self.assertEqual(10,analyse._updateBallGridLocation(233, 172))
+
+
 
 if __name__ == "__main__":
     #unittest.main()
