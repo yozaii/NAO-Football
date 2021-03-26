@@ -2,6 +2,8 @@
 #     Classes Coach      #
 #------------------------#
 # -*- coding: utf-8 -*-
+#pyuic5 -x interface.ui -o interface.pyw
+
 import math
 import random
 from Node import *
@@ -103,7 +105,7 @@ class Coach:
                     break;
             
 
-        # doit retourner la liste des robots à qui je peux faire la passe
+        # must return list of robot that i can pass the ball
     
     def get_role(self):
         return self.__role
