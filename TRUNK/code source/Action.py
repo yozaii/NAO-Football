@@ -1,85 +1,139 @@
 # -*- coding: utf-8 -*-
-import sys
+import qi
 import argparse
-import math
+import sys
 import time
+import math
 from naoqi import ALProxy
 IP = "127.0.0.1"
-#IP = "169.254.60.184"
+#IP = "172.27.96.32"
 PORT = 9559
 
 def connect(module):
     """
     allows to connect the robot
+    Create a proxy to ALMotion and ALRobotPosture.
     """
-    # Create a proxy to ALMotion.
     try:
         return ALProxy(module, IP, PORT)
     except Exception,e:
-        print "Could not create proxy to ALMotion"
+        print "Could not create proxy"
         print "Error was: ",e
+    
 
 
 def shoot(postureProxy, motionProxy):
     """
     #The robot shoot in the ball.
     """
-
+    motionProxy.moveInit()
     stiffnesses  = 1
-    isAbsolute  = True
-
-    # se baisse sur ses appuies
-    appuie = ["LKneePitch","LAnklePitch","RKneePitch","RAnklePitch"]
-    angleAppuie = [math.radians(14),math.radians(-14),math.radians(14),math.radians(-14)]
-    timeListsAppuie = [1.0,1.0]
-
+    isAbsolute  = False
+    #leg 
+    names = ["LHipRoll","RHipPitch"]
+    angleLists = [math.radians(5),math.radians(20.3)]
+    timeLists = [2.0,2.0]
     motionProxy.setStiffnesses(names, stiffnesses)
     motionProxy.angleInterpolation(names, angleLists, timeLists, isAbsolute)
-
-    names = ["LHipRoll","RHipRoll","RKneePitch","LKneePitch","LAnklePitch"]
-    angleLists = [math.radians(17),math.radians(8),math.radians(80),math.radians(14),math.radians(-14)]
-    timeLists = [1.0,1.0,1.1,1.2,1.3,1.3]
     
-
+    # on tire
+    names = ["RKneePitch","RHipPitch","RAnklePitch"]
+    angleLists = [math.radians(15),math.radians(-30),math.radians(-6)]
+    timeLists = [0.8,0.6,1.0]
     motionProxy.setStiffnesses(names, stiffnesses)
     motionProxy.angleInterpolation(names, angleLists, timeLists, isAbsolute)
-    time.sleep(1.5)
+    motionProxy.moveInit()
+    postureProxy.goToPosture("StandInit", 2)
+
+def simpleShoot(postureProxy, motionProxy):
+
+    motionProxy.moveInit()
+    stiffnesses  = 1
+    isAbsolute  = False
+    names = ["RKneePitch","RHipPitch","RAnklePitch"]
+    angleLists = [math.radians(15),math.radians(-20),math.radians(-6)]
+    timeLists = [0.8,0.6,1.0]
+    motionProxy.setStiffnesses(names, stiffnesses)
+    motionProxy.angleInterpolation(names, angleLists, timeLists, isAbsolute)
+    motionProxy.moveInit()
+    postureProxy.goToPosture("StandInit", 2)
+
+def lSideShoot(postureProxy, motionProxy):
+    motionProxy.moveInit()
+    postureProxy.goToPosture("StandInit", 2)
+    motionProxy.moveTo(0, 0.02, 0)
+    motionProxy.moveInit()
+def rSideShoot(postureProxy, motionProxy):
+    motionProxy.moveInit()
+    postureProxy.goToPosture("StandInit", 2)
+    stiffnesses  = 1
+    isAbsolute  = False
+    names = ["RHipRoll"]
+    angleLists = [math.radians(-8)]
+    timeLists = [0.9]
+    motionProxy.setStiffnesses(names, stiffnesses)
+    motionProxy.angleInterpolation(names, angleLists, timeLists, isAbsolute)
     motionProxy.moveInit()
 
 
-def get_up():
+def postureDeJeu(postureProxy, motionProxy):
+    """
+    se met en posture de jeu
+    """
+    #dabord en pos initial
+    motionProxy.moveInit()
+    #puis les mains aligner
+    stiffnesses  = 1
+    isAbsolute  = False
+    names = ["LElbowRoll","RElbowRoll","LShoulderRoll","RShoulderRoll"]
+    angleLists = [math.radians(36.2),math.radians(-36.2),math.radians(-10),math.radians(10)]
+    timeLists = [1.0,1.0,1.0,1.0]
+    motionProxy.setStiffnesses(names, stiffnesses)
+    motionProxy.angleInterpolation(names, angleLists, timeLists, isAbsolute)
+
+def get_up(postureProxy):
     """
     Nao get up.
     """
-    motionProxy.moveInit()
-    motionProxy.goToPosture("StandInit", 0.4)
+    postureProxy.goToPosture("StandInit", 2)
 
-def walk(motionProxy):
+def walk(motionProxy ):
     """
     The robot walk.
     """
+    x = 2
+    #x(m)
+    y = 0
+    #y(m)
+    theta = 0
+    #theta(degree)
     motionProxy.moveInit()
-    motionProxy.moveTo(0.5, 0, 0)
+    motionProxy.moveTo(x, y, theta)
 
-def turn():
+def turn(motionProxy, degree):
     """
-    The robot have to turn.
+    The robot has to turn at a certain numbre of degres.
     """
-def standby():
+    #this calcul give the right number to turn nao at a certain degres
+    theta = (1.5709 * degree) / 90
+    x = 0
+    y = 0
+    #pi/2 anti-clockwise (90 degrees)
+    motionProxy.moveInit()
+    motionProxy.moveTo(x, y, theta)
+
+def standby(postureProxy):
     """
     The robot stay and do nothing.
     """
     postureProxy.stopMove()
 
-def to_place():
-    """
-    The robot go to the willing position.
-    """
-def danse(postureProxy,motionProxy):
+
+def danse(postureProxy, motionProxy):
     """
     Make the robot danse.
     """
-    postureProxy.goToPosture("StandInit", 0.5)
+    postureProxy.goToPosture("StandInit", 2)
     footStepsList = [] 
     # 1) Step forward with your left foot
     footStepsList.append([["LLeg"], [[0.06, 0.1, 0.0]]])
@@ -94,7 +148,7 @@ def danse(postureProxy,motionProxy):
     # 6)Step forward & right with your right foot
     footStepsList.append([["RLeg"], [[0.00, -0.16, 0.0]]])
     # 7) Move your left foot to your right foot
-    footStepsList.append([["LLeg"], [[0.00, 0.1, 0.0]]])
+    footStepsList.append([["LLeg"], [[0.00, 0.1, 0.0]]])                    
     # 8) Sidestep to the right with your right foot
     footStepsList.append([["RLeg"], [[0.00, -0.16, 0.0]]])
 
@@ -127,5 +181,12 @@ def danse(postureProxy,motionProxy):
 
 motionProxy = connect("ALMotion")
 postureProxy = connect("ALRobotPosture")
-
-shoot(postureProxy, motionProxy)
+#danse(postureProxy, motionProxy)
+#get_up(postureProxy)
+#turn(motionProxy, -40)
+#walk(motionProxy)
+#postureDeJeu(postureProxy, motionProxy)
+#shoot(postureProxy,motionProxy)
+#lSideShoot(postureProxy, motionProxy)
+rSideShoot(postureProxy, motionProxy)
+#simpleShoot(postureProxy, motionProxy)
