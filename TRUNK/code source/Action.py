@@ -137,7 +137,33 @@ def lookAround(motionProxy):
     motionProxy.setStiffnesses(name, 1)
     angleLists = [-2.0857, 2.0857]
     timeLists = [2.5, 5.0]
-    self.motion.post.angleInterpolation(name, angleLists, timeLists, True)
+    motionProxy.post.angleInterpolation(name, angleLists, timeLists, True)
+
+def lookTowards(motionProxy, direction):
+    """
+    The robot looks 45 degrees towards a chosen direction
+    :param direction: String containing direction
+    """
+    motionProxy.setStiffnesses(name, 1)
+    name = "HeadYaw"
+    if (direction == "Right"):
+        motionProxy.post.angleInterpolation(name, [-0.79], [1.0], False)
+    elif (direction == "Left"):
+        motionProxy.post.angleInterpolation(name, [0.79], [1.0], False)
+
+def turnBodyToHeadAngle(motionProxy):
+    """
+    The body of the robot aligns itself with head angle
+    """
+    # Once the ball is found we stop the head from moving
+    motionProxy.angleInterpolation("HeadYaw", [0.0], [1.0], False)
+
+    # We get the angle of the head
+    angle = motionProxy.getAngles("HeadYaw", False)
+
+    # We move the body and face to face the ball
+    motionProxy.moveTo(0.0, 0.0, angle[0])
+    motionProxy.angleInterpolation("HeadYaw", [0.0], [1.0], True)
 
 
 def danse(postureProxy, motionProxy):

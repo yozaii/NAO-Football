@@ -75,9 +75,9 @@ class NAOVision :
         Retrieves a new image from Nao
         """
         if (cameraID == 0):
-            self._alImage = self._videoProxy.getImageRemote(self._imgClientTop)
+            self._alImage = self._videoProxy.post.getImageRemote(self._imgClientTop)
         elif (cameraID == 1):
-            self._alImage = self._videoProxy.getImageRemote(self._imgClientBottom)
+            self._alImage = self._videoProxy.post.getImageRemote(self._imgClientBottom)
         #still needs work to get proper dimensions
         self._image.data = self._alImage[6]
         return self._image

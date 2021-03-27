@@ -13,14 +13,17 @@ class Analyse :
     def __init__(self, IP, PORT):
 
         #ballCoordinates will give the x,y of the center of the ball
-        self._ballCoordinates = [None] * 2
+        self._ballCoordinatesTop = [-1, -1]
+        self._ballCoordinatesBottom = [-1, -1]
 
         #ballGridLocation is an int that gives the rough square where the
         #ball's center is (values between 0 -> 15 inclusive)
-        self._ballGridLocation = None
+        self._ballGridLocationTop = -1
+        self._ballGridLocationBottom = -1
 
         #Ball area as perceived by the camera
-        self._ballArea
+        self._ballAreaTop = -1
+        self._ballAreaBottom= -1
 
         self._vision = NVis(IP, PORT)
         self._imPr = ImPr()
@@ -29,35 +32,57 @@ class Analyse :
         self._vision._subscribeToVideoProxy(0)
         self._vision._subscribeToVideoProxy(1)
 
-    def _updateBallInfo(self, img, xml):
+    def _updateBallInfo(self, img, xml, CameraID):
         """
         This function updates the value of all ball related attributes by using
-        the ImageProcessing function findBallRectangle()
-        :param img:
-        :param xml:
-        :return:
+        the ImageProcessing function findBallRectangle().
+        :param img: the image to be processed
+        :param xml: the xml to use
+        :param CameraID: top or bottom camera (0 and 1 respectively)
         """
-        ballInfo = self._imPr.findBallRectangle(img,xml)
+        ballInfo = self._imPr.findBallRectangle(img, xml)
 
-        #If no ball is detected
-        if (len(ballInfo)<1):
-            self._ballCoordinates[0]= -1
-            self._ballCoordinates[0]= -1
-            self._ballArea = -1
-            self._ballGridLocation = -1
+        if (CameraID == 0):
 
-        #If ball is detected
-        else :
-            #ballInfo[4] corresponds to x of center of ball
-            #ballinfo[5] corresponds to y of center of ball
-            #ballInfo[6] corresponds to the area of the ball
-            self._ballCoordinates[0] = ballInfo[4]
-            self._ballCoordinates[1] = ballInfo[5]
-            self._ballArea = ballInfo[6]
-            self._updateBallGridLocation(self._ballCoordinates[0], self._ballCoordinates[1])
+            #If no ball is detected
+            if (len(ballInfo)<1):
+                self._ballCoordinatesTop[0]= -1
+                self._ballCoordinatesTop[0]= -1
+                self._ballAreaTop = -1
+                self._ballGridLocationTop = -1
+
+            #If ball is detected
+            else :
+                #ballInfo[4] corresponds to x of center of ball
+                #ballinfo[5] corresponds to y of center of ball
+                #ballInfo[6] corresponds to the area of the ball
+                self._ballCoordinatesTop[0] = ballInfo[4]
+                self._ballCoordinatesTop[1] = ballInfo[5]
+                self._ballAreaTop = ballInfo[6]
+                self._updateBallGridLocation(self._ballCoordinatesTop[0], self._ballCoordinatesTop[1], 0)
+
+        elif (CameraID == 1):
+
+            #If no ball is detected
+            if (len(ballInfo)<1):
+                self._ballCoordinatesBottom[0]= -1
+                self._ballCoordinatesBottom[0]= -1
+                self._ballAreaBottom = -1
+                self._ballGridLocationBottom = -1
+
+            #If ball is detected
+            else :
+                #ballInfo[4] corresponds to x of center of ball
+                #ballinfo[5] corresponds to y of center of ball
+                #ballInfo[6] corresponds to the area of the ball
+                self._ballCoordinatesBottom[0] = ballInfo[4]
+                self._ballCoordinatesBottom[1] = ballInfo[5]
+                self._ballAreaBottom = ballInfo[6]
+                self._updateBallGridLocation(self._ballCoordinatesTop[0], self._ballCoordinatesTop[1], 1)
 
 
-    def _updateBallGridLocation(self, x, y):
+
+    def _updateBallGridLocation(self, x, y, cameraID):
         """
         This function updates the value of BallGridLocation
         Returns the value of the square holding
@@ -65,12 +90,15 @@ class Analyse :
         16 squares (from 0->15). Will be called in updateBallCoordinates
         :param x:
         :param y:
+        :param cameraID:
         :return:
         """
         xx = x/80
         yy = y/60
-        self._ballGridLocation = (xx + 4*(yy))
-
+        if (cameraID == 0):
+            self._ballGridLocationTop = (xx + 4 * (yy))
+        elif (cameraID == 1):
+            self._ballGridLocationBottom = (xx + 4* (yy))
         return (xx + 4*(yy))
 
     def _takeTopImage(self, xml):
@@ -79,25 +107,15 @@ class Analyse :
         and updates ball information accordingly
         """
         img = self._vision._takeImage(0)
-        self._updateBallInfo(img, xml)
+        self._updateBallInfo(img, xml, 0)
 
-    def _takeBottomImage(self,img,xml):
+    def _takeBottomImage(self, xml):
         """
         Takes an image using the top camera
         and updates ball information accordingly
         """
         img = self._vision._takeImage(1)
-        self._updateBallInfo(img, xml)
-
-    def _getBallCoordinates(self):
-        return self._ballCoordinates
-
-    def _getBallArea(self):
-        return self._ballArea
-
-    def _getBallGridLocation(self):
-        return self._ballGridLocation
-
+        self._updateBallInfo(img, xml, 1)
 
 
 class TestAnalyse(unittest.TestCase):
@@ -107,12 +125,14 @@ class TestAnalyse(unittest.TestCase):
         Tests if BallGridLocation gets updated correctly
         """
         analyse = Analyse(IP,PORT)
-        self.assertEqual(10,analyse._updateBallGridLocation(233, 172))
+        self.assertEqual(10,analyse._updateBallGridLocation(233, 172, 0))
+
+
 
 
 
 if __name__ == "__main__":
-    #unittest.main()
+    unittest.main()
 
     #Other tests below:
     """Testing updateBallCoordinates
@@ -124,7 +144,7 @@ if __name__ == "__main__":
     print(analyse._getBallCoordinates())
     print(time.time()-times)"""
 
-
+    """
     #Testing imageCapture on top camera
     xml = 'C:\\Users\\Youssef\\Downloads\\ball_cascade.xml'
     analyse = Analyse('172.27.96.32', 9559)
@@ -139,3 +159,4 @@ if __name__ == "__main__":
     #cv2.imshow('NAOImage',naoimg)
     #cv2.waitKey()
     #cv2.destroyAllWindows()
+    """

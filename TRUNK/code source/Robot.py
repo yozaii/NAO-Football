@@ -57,21 +57,70 @@ class Robot:
         the ball. Once the ball is found, it moves its
         body to face the ball
         """
-
         #While ball is not found
-        while (self.__analyse._ballArea == -1):
+        while (self.__analyse._ballAreaTop == -1 && self.__analyse._ballAreaBottom == -1):
             Action.lookAround(motionProxy)
             self.__analyse._takeTopImage(xml)
+            self.__analyse._takeBottomImage(xml)
 
-        #Once the ball is found we stop the head from moving
-        motionProxy.angleInterpolation("HeadYaw",[0.0],[1.0], False)
+        #The robot and head face the ball
+        Action.turnBodyToHeadAngle(motionProxy)
 
-        #We get the angle of the head
-        angle = motionProxy.getAngles("HeadYaw", False)
+    def moveToBall(self):
+        """
+        The robot moves towards the ball
+        :return: exit state. If ball is lost (0) or if ball is at robots feet(1)
+        """
+        self.__analyse._takeBottomImage(xml)
 
-        #We move the body and face to face the ball
-        motionProxy.post.moveTo(0.0, 0.0, angle[0])
-        motionProxy.angleInterpolation("HeadYaw", [0.0], [1.0], True)
+        #While the ball is visible in the camera and it is not near the feet
+        while (self.__analyse._ballAreaBottom != -1 and
+               self.__analyse._ballGridLocationBottom !=13 and
+               self.__analyse._ballGridLocationBottom !=14
+        ):
+            #An image is taken
+            self.__analyse._takeBottomImage(xml)
+
+            #If the ball is perceived towards the right
+            if (self.__analyse._ballGridLocationBottom == 3 or
+                self.__analyse._ballGridLocationBottom == 7 or
+                self.__analyse._ballGridLocationBottom == 11 or
+                self.__analyse._ballGridLocationBottom == 15
+
+            ):
+                #The robot looks and moves towards the ball
+                Action.lookTowards(motionProxy, "Right")
+                Action.turnBodyToHeadAngle(motionProxy)
+                motionProxy.waitUntilMoveIsFinished()
+                motionProxy.post.moveTowards(1.0,0.0,0.0)
+
+            #if the ball is perceived towards the left
+            elif (self.__analyse._ballGridLocationBottom == 0 or
+                self.__analyse._ballGridLocationBottom == 4 or
+                self.__analyse._ballGridLocationBottom == 8 or
+                self.__analyse._ballGridLocationBottom == 12
+            ):
+                # The robot looks and moves towards the ball
+                Action.lookTowards(motionProxy, "Left")
+                Action.turnBodyToHeadAngle(motionProxy)
+                motionProxy.waitUntilMoveIsFinished()
+                motionProxy.post.moveTowards(1.0,0.0,0.0)
+
+            #If the ball is perceived around the center
+            else:
+                motionProxy.post.moveTowards(1.0,0.0,0.0)
+
+        motionProxy.stopMove()
+
+        #If ball is lost return 0
+        if (self.__analyse._ballAreaBottom != -1):
+            return 0
+        #If ball is at feet return 1
+        elif (self.__analyse._ballGridLocationBottom ==13 or
+               self.__analyse._ballGridLocationBottom ==14
+        ):
+            return 1
+
 
 
 
