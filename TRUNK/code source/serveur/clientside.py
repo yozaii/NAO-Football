@@ -47,37 +47,29 @@ class Client:
             raise e
 
     def send_message(self, message=""):
-
-        if type(message) is str:
-            msg = message.encode("utf8")
-            """
-            lenght_msg = len(msg)
-            lenght_msg = str(lenght_msg).encode("utf8")
-            lenght_msg += b' ' * (HEADER - len(lenght_msg))
-            self.client_socket.send(lenght_msg)
-            """
-            self.client_socket.send(msg)
-            print(self.client_socket.recv(1024).decode("utf8"))
-        else:
-            msg = pickle.dumps(message)
-            print(msg)
-            self.client_socket.send(msg)
+        msg = pickle.dumps(message)
+        print(type(msg))
+        self.client_socket.send(msg)
+        print(self.client_socket.recv(1024).decode("utf8"))
 
     def disconnection(self):
         self.send_message(self.DISCONNECTION_MESSAGE)
 
-class Humain:
-    def __init__(self):
-        self.name = "test"
 
-"""
+
 c1 = Client()
-h = Humain()
+c2 = Client()
 c1.connection()
+c2.connection()
 d= {1: "ptdr",2: "lol"}
+c1.send_message("Hello world")
 c1.send_message(d)
-"""
+c2.send_message("Hello world 2")
+c2.send_message("Hello world 3")
+c1.disconnection()
+c2.disconnection()
 
+"""
 class TestClient(unittest.TestCase):
     def setUp(self) -> None:
         self.c1 = Client()
@@ -98,3 +90,4 @@ class TestClient(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+"""

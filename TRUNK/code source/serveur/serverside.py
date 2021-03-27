@@ -1,6 +1,5 @@
 # coding: utf-8
 import pickle
-import select
 import socket
 import threading
 import unittest
@@ -87,25 +86,25 @@ class Server:
 
         while is_connected:
             msg = socket_client.recv(1024)
-            #unpickler = pickle.Unpickler(msg)
-            msg = pickle.loads(msg)
-            print(f"{adresse_client} a envoyé : {msg}")
-            if msg == Server.DISCONNECTION_MESSAGE:
-                is_connected = False
-                socket_client.send("Je te déconnecte".encode("utf8"))
-            else:
-                socket_client.send("J'ai bien reçu ton message".encode("utf8"))
-                #Server.send_message(socket_client)
+            if len(msg) > 0:
+                msg = pickle.loads(msg)
+                print(f"{adresse_client} a envoyé : {msg}")
+                print(len((msg)))
+                if msg == Server.DISCONNECTION_MESSAGE:
+                    is_connected = False
+                    socket_client.send("Je te déconnecte".encode("utf8"))
+                else:
+                    socket_client.send("J'ai bien reçu ton message".encode("utf8"))
         
         socket_client.close()
     
     client_connection = staticmethod(client_connection)
 
     def send_message(message_socket=None):
-        Server.server.sendto(message_socket, "ip de coach")
+        Server.server.sendto(message_socket, "adresse de coach")
         
 
-#Server.starting_server()
+Server.starting_server()
 
 class TestServer(unittest.TestCase):
     def setUp(self) -> None:
