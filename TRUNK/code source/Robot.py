@@ -75,19 +75,14 @@ class Robot:
 
         #While the ball is visible in the camera and it is not near the feet
         while (self.__analyse._ballAreaBottom != -1 and
-               self.__analyse._ballGridLocationBottom !=13 and
-               self.__analyse._ballGridLocationBottom !=14
+               self.__analyse._ballGridLocationBottom[1] != [3,1] and
+               self.__analyse._ballGridLocationBottom[1] != [3,2]
         ):
             #An image is taken
             self.__analyse._takeBottomImage(xml)
 
             #If the ball is perceived towards the right
-            if (self.__analyse._ballGridLocationBottom == 3 or
-                self.__analyse._ballGridLocationBottom == 7 or
-                self.__analyse._ballGridLocationBottom == 11 or
-                self.__analyse._ballGridLocationBottom == 15
-
-            ):
+            if (self.__analyse._ballGridLocationBottom[1] == 3):
                 #The robot looks and moves towards the ball
                 Action.lookTowards(motionProxy, "Right")
                 Action.turnBodyToHeadAngle(motionProxy)
@@ -95,11 +90,7 @@ class Robot:
                 motionProxy.post.moveTowards(1.0,0.0,0.0)
 
             #if the ball is perceived towards the left
-            elif (self.__analyse._ballGridLocationBottom == 0 or
-                self.__analyse._ballGridLocationBottom == 4 or
-                self.__analyse._ballGridLocationBottom == 8 or
-                self.__analyse._ballGridLocationBottom == 12
-            ):
+            elif (self.__analyse._ballGridLocationBottom[1] == 0):
                 # The robot looks and moves towards the ball
                 Action.lookTowards(motionProxy, "Left")
                 Action.turnBodyToHeadAngle(motionProxy)
@@ -116,8 +107,8 @@ class Robot:
         if (self.__analyse._ballAreaBottom != -1):
             return 0
         #If ball is at feet return 1
-        elif (self.__analyse._ballGridLocationBottom ==13 or
-               self.__analyse._ballGridLocationBottom ==14
+        elif (self.__analyse._ballGridLocationBottom == [3,1] or
+               self.__analyse._ballGridLocationBottom ==[3,2]
         ):
             return 1
 

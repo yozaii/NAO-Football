@@ -18,8 +18,8 @@ class Analyse :
 
         #ballGridLocation is an int that gives the rough square where the
         #ball's center is (values between 0 -> 15 inclusive)
-        self._ballGridLocationTop = -1
-        self._ballGridLocationBottom = -1
+        self._ballGridLocationTop = [-1, -1]
+        self._ballGridLocationBottom = [-1, -1]
 
         #Ball area as perceived by the camera
         self._ballAreaTop = -1
@@ -29,8 +29,8 @@ class Analyse :
         self._imPr = ImPr()
 
         #Connects to top and bottom video cameras
-        self._vision._subscribeToVideoProxy(0)
-        self._vision._subscribeToVideoProxy(1)
+        #self._vision._subscribeToVideoProxy(0)
+        #self._vision._subscribeToVideoProxy(1)
 
     def _updateBallInfo(self, img, xml, CameraID):
         """
@@ -96,10 +96,10 @@ class Analyse :
         xx = x/80
         yy = y/60
         if (cameraID == 0):
-            self._ballGridLocationTop = (xx + 4 * (yy))
+            self._ballGridLocationTop = [xx, yy]
         elif (cameraID == 1):
-            self._ballGridLocationBottom = (xx + 4* (yy))
-        return (xx + 4*(yy))
+            self._ballGridLocationBottom = [xx, yy]
+        return [xx, yy]
 
     def _takeTopImage(self, xml):
         """
@@ -125,7 +125,7 @@ class TestAnalyse(unittest.TestCase):
         Tests if BallGridLocation gets updated correctly
         """
         analyse = Analyse(IP,PORT)
-        self.assertEqual(10,analyse._updateBallGridLocation(233, 172, 0))
+        self.assertEqual([2, 2],analyse._updateBallGridLocation(233, 172, 0))
 
 
 
