@@ -3,6 +3,7 @@ import pickle
 import socket
 import threading
 import unittest
+
 """
 #Permet d'ouvrir une connexion avec une machine local/distante
 ouvrir_connexion_avec_clients = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -58,15 +59,20 @@ for client in clients_connectes:
 ouvrir_connexion_avec_clients.close()
 """
 #-----------------------------------------------------------------------------------------------
+        
 class Server:
     host = socket.gethostbyname(socket.gethostname())
     port = 10000
     HEADER = 64
     DISCONNECTION_MESSAGE = "fin"
+    clients = set()
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind((host, port))
 
     def starting_server():
+        """
+        Start the server
+        """
         #sockets_lu = []
         print("[DEMMARAGE] LE SERVEUR A ÉtÉ LANCÉ")
         Server.server.listen(5)
@@ -74,6 +80,9 @@ class Server:
         while True:
             #sockets_lu, sockets_ecrit, sockets_erreur = select.select([serveur], [], [], 0.1)
             socket_client, adresse_client = Server.server.accept()
+            if adresse_client not in Server.clients:
+                Server.clients.add(adresse_client)
+                print(Server.clients)
             thread_connexion = threading.Thread(target=Server.client_connection, args=(socket_client, adresse_client))
             thread_connexion.start()
     
@@ -89,19 +98,22 @@ class Server:
             if len(msg) > 0:
                 msg = pickle.loads(msg)
                 print(f"{adresse_client} a envoyé : {msg}")
-                print(len((msg)))
                 if msg == Server.DISCONNECTION_MESSAGE:
                     is_connected = False
-                    socket_client.send("Je te déconnecte".encode("utf8"))
+                    #socket_client.send("Je te déconnecte".encode("utf8"))
                 else:
-                    socket_client.send("J'ai bien reçu ton message".encode("utf8"))
-        
+                    Server.broadcast(adresse_client, pickle.dumps(msg))
+                    #socket_client.send("J'ai bien reçu ton message".encode("utf8"))
+        if adresse_client in Server.clients:
+            Server.clients.remove(adresse_client)
         socket_client.close()
     
     client_connection = staticmethod(client_connection)
 
-    def send_message(message_socket=None):
-        Server.server.sendto(message_socket, "adresse de coach")
+    def broadcast(adress_sender=None, message_socket=None):
+        for client in Server.clients:
+            if adress_sender != client and not Server.clients:
+                Server.server.sendto(message_socket, client)
         
 
 Server.starting_server()
@@ -116,8 +128,8 @@ class TestServer(unittest.TestCase):
     def test_client_connection_RaisesIllegalArgument(self):
          self.assertRaises(Exception,Server.client_connection, ("je veux une erreur", None))
 
-    def test_send_message_with_IllegaleArgument(self):
-        self.assertRaises(Exception,Server.send_message, ("je veux une erreur", None))
+    def test_broadcast_with_IllegaleArgument(self):
+        self.assertRaises(Exception,Server.broadcast, ("je veux une erreur", None))
 
 
 if __name__ == "__main__":

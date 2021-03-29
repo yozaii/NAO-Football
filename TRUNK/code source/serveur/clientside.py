@@ -1,6 +1,10 @@
 # coding: utf-8
+from cmath import sqrt
 import pickle
 import socket
+import sys
+import threading
+sys.path.append(".")
 import unittest
 """
 #Permet d'ouvrir une connexion avec une machine local/distante
@@ -37,24 +41,33 @@ class Client:
     DISCONNECTION_MESSAGE = "fin"
 
     def __init__(self):
+        self.is_connected = False
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     def connection(self):
         try:
+            self.is_connected = True
             self.client_socket.connect((Client.host, Client.port))
         except ConnectionRefusedError as e:
+            self.is_connected = False
             print("La connexion au serveur a échouée !")
             raise e
 
     def send_message(self, message=""):
         msg = pickle.dumps(message)
-        print(type(msg))
         self.client_socket.send(msg)
-        print(self.client_socket.recv(1024).decode("utf8"))
+        #print(self.client_socket.recv(1024).decode("utf8"))
+
+    def listening(self):
+        while self.is_connected:
+            msg_receiv = self.client_socket.recv(1024)
+            if len(msg_receiv) > 0:
+                msg_receiv = pickle.loads(msg_receiv)
+                print(msg_receiv)
 
     def disconnection(self):
+        self.is_connected = False
         self.send_message(self.DISCONNECTION_MESSAGE)
-
 
 
 c1 = Client()
@@ -66,6 +79,7 @@ c1.send_message("Hello world")
 c1.send_message(d)
 c2.send_message("Hello world 2")
 c2.send_message("Hello world 3")
+#c1.send_message(h)
 c1.disconnection()
 c2.disconnection()
 

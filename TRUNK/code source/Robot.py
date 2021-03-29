@@ -1,9 +1,12 @@
 #------------------------#
 #     Classes Robot      #
 #------------------------#
+import threading
 from naoqi import ALProxy
 import Analyse
 import Action
+from .serveur.clientside import Client
+from .Node import Point3D
 
 class Robot:
     """ 
@@ -17,6 +20,11 @@ class Robot:
         self.__ip = ip
         self.__role = role
         self.__analyse = Analyse.Analyse(ip,PORT)
+        self.client = Client()
+        self.__pos2 = None
+        self.__pos3 = None
+        self.__pos4 = None
+        self.__pos5 = None
 
 
         # connection to the differentes modules
@@ -30,6 +38,28 @@ class Robot:
         # take his place for his role
         #moveTo(role.initPos)
 
+    def connectionServer(self):
+        """
+        The client robot access to the server (have to be tested)
+        """
+        self.client.connection()
+    
+    def send_postition_to_team(self):
+        """
+        The client robot send his position to
+        the rest of the team (have to be tested)
+        """
+        self.client.send_message(self.get_pos())
+
+    def receive_position_of_team(self):
+        """
+        Receive the position of his teammate (have to be tested)
+        (have to find a way to recup the position of each others robots)
+        """
+        while self.client.is_connected:
+            thread_listening = threading.Thread(target=self.listening)
+            thread_listening.start()
+        
     def connectProxy(self,ip,module):
         """
         allows to connect the robot
