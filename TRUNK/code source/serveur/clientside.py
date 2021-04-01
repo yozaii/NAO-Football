@@ -1,39 +1,12 @@
 # coding: utf-8
-from cmath import sqrt
+import argparse
 import pickle
 import socket
-import sys
 import threading
-sys.path.append(".")
 import unittest
-"""
-#Permet d'ouvrir une connexion avec une machine local/distante
-ouvrir_connexion_avec_serveur = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+import qi
+from naoqi import ALProxy
 
-#Nom d'hôte et de port afin de connecter notre socket
-host = "localhost"#socket.gethostbyname(socket.gethostname())
-print(host)
-port = 10000 #ceux entre 0 et 1023 sont réservé au système
-
-
-try:
-    ouvrir_connexion_avec_serveur.connect((host, port))
-
-    msg_a_envoyer = b""
-    while msg_a_envoyer != b"fin":
-        msg_a_envoyer = input("> ")
-        # Peut planter si vous tapez des caractères spéciaux
-        msg_a_envoyer = msg_a_envoyer.encode("utf8")
-        # On envoie le message
-        ouvrir_connexion_avec_serveur.send(msg_a_envoyer)
-        msg_recu = ouvrir_connexion_avec_serveur.recv(1024)
-        print(msg_recu.decode("utf8"))
-except ConnectionRefusedError:
-    print("La connexion au serveur a échouée !")
-finally:
-    ouvrir_connexion_avec_serveur.close()
-"""
-#--------------------------------------------------------------------
 class Client:
     host = "192.168.56.1" #Doit être l'IP du serveur (ou nom DNS)
     port = 10000
@@ -69,12 +42,56 @@ class Client:
         self.is_connected = False
         self.send_message(self.DISCONNECTION_MESSAGE)
 
+    def returnIP(self):
+        return socket.gethostbyname(socket.gethostname())
 
+app = qi.Application(url="tcp://172.27.96.32:9559")
+app.start()
+session = app.session
+myClient = Client()
+id = session.registerService("Client", Client())
+robotClient = session.service("Client")
+
+networkProxy = ALProxy("ALConnectionManager", "172.27.96.32", 9559)
+networkProxy.connect(id)
+#app.run()
+print robotClient.returnIP()
+app.stop()
+"""
+parser = argparse.ArgumentParser()
+parser.add_argument("--ip", type=str, default="172.27.96.32",help="Robot IP address. On robot or Local Naoqi: use '127.0.0.1'.")
+parser.add_argument("--port", type=int, default=9559,help="Naoqi port number")
+args = parser.parse_args()
+
+networkProxy = ALProxy("ALConnectionManager", "172.27.96.32", 9559)
+session = qi.Session()
+session.connect("tcp://172.27.96.32:9559")
+serviceId = session.registerService("Client", Client())
+
+robotClient = session.service("Client")
+print robotClient
+#print robotClient.returnIp()
+
+#session.connect("tcp://" + args.ip + ":" + str(args.port))
+#robotClient = session.service("ALConnectionManager")
+
+
+#print serviceId
+
+#robotClient.connect(serviceId)
+#print robotClient.returnIP
+"""
+"""
 c1 = Client()
 c2 = Client()
 c1.connection()
 c2.connection()
-d= {1: "ptdr",2: "lol"}
+#thread_listening1 = threading.Thread(target=c1.listening)
+#thread_listening2 = threading.Thread(target=c2.listening)
+#thread_listening1.start()
+#thread_listening2.start()
+print(c1.port)
+d= {1: "ptdr",2: "lol"} 
 c1.send_message("Hello world")
 c1.send_message(d)
 c2.send_message("Hello world 2")
@@ -82,6 +99,7 @@ c2.send_message("Hello world 3")
 #c1.send_message(h)
 c1.disconnection()
 c2.disconnection()
+"""
 
 """
 class TestClient(unittest.TestCase):
