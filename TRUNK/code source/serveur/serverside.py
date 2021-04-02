@@ -58,8 +58,7 @@ for client in clients_connectes:
     client.close()
 ouvrir_connexion_avec_clients.close()
 """
-#-----------------------------------------------------------------------------------------------
-        
+#-----------------------------------------------------------------------------------------------    
 class Server:
     host = socket.gethostbyname(socket.gethostname())
     port = 10000
@@ -71,39 +70,39 @@ class Server:
 
     def starting_server():
         """
-        Start the server
+        Start the server and show where he's listening
         """
-        #sockets_lu = []
-        print("[DEMMARAGE] LE SERVEUR A ÉtÉ LANCÉ")
+        print "[DEMMARAGE] LE SERVEUR A EtE LANCE"
         Server.server.listen(5)
-        print(f"[ÉCOUTE] LE SERVEUR ÉCOUTE A L'ADRESSE {Server.host, Server.port}")
+        print "[ECOUTE] LE SERVEUR ECOUTE A L'ADRESSE "+str(Server.host)+ ","+str(Server.port)
         while True:
-            #sockets_lu, sockets_ecrit, sockets_erreur = select.select([serveur], [], [], 0.1)
             socket_client, adresse_client = Server.server.accept()
-            if adresse_client not in Server.clients:
+            if adresse_client not in Server.clients: #add the clients in a dynamic table
                 Server.clients.add(adresse_client)
-                print(Server.clients)
             thread_connexion = threading.Thread(target=Server.client_connection, args=(socket_client, adresse_client))
             thread_connexion.start()
     
     starting_server = staticmethod(starting_server)
 
     def client_connection(socket_client=None, adresse_client=None):
-
-        print(f"{adresse_client} c'est connecté !")
+        """
+        Take the connection with a client,
+        and catch his message
+        """
+        print str(adresse_client)+" c'est connecte !"
         is_connected = True
 
         while is_connected:
             msg = socket_client.recv(1024)
             if len(msg) > 0:
                 msg = pickle.loads(msg)
-                print(f"{adresse_client} a envoyé : {msg}")
+                print str(adresse_client) +"a envoye : "+str(msg)
                 if msg == Server.DISCONNECTION_MESSAGE:
                     is_connected = False
-                    #socket_client.send("Je te déconnecte".encode("utf8"))
+                    socket_client.send("Je te deconnecte".encode("utf8"))
                 else:
-                    Server.broadcast(adresse_client, pickle.dumps(msg))
-                    #socket_client.send("J'ai bien reçu ton message".encode("utf8"))
+                    #Server.broadcast(adresse_client, pickle.dumps(msg))
+                    socket_client.send("J'ai bien recu ton message".encode("utf8"))
         if adresse_client in Server.clients:
             Server.clients.remove(adresse_client)
         socket_client.close()
@@ -111,15 +110,21 @@ class Server:
     client_connection = staticmethod(client_connection)
 
     def broadcast(adress_sender=None, message_socket=None):
+        """
+        Send to others clients the message that the current
+        client has sent to the server
+        """
         for client in Server.clients:
             if adress_sender != client and not Server.clients:
                 Server.server.sendto(message_socket, client)
+    
+    broadcast = staticmethod(broadcast)
         
 
 Server.starting_server()
 
 class TestServer(unittest.TestCase):
-    def setUp(self) -> None:
+    def setUp(self):
         return super().setUp()
 
     def test_client_connection_with_no_arguments(self):
