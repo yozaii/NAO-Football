@@ -29,8 +29,10 @@ class Analyse :
         self._imPr = ImPr()
 
         #Connects to top and bottom video cameras
-        #self._vision._subscribeToVideoProxy(0)
-        #self._vision._subscribeToVideoProxy(1)
+        #self._vision._unsubscribeToVideoProxy(0)
+        #self._vision._unsubscribeToVideoProxy(1)
+        self._vision._subscribeToVideoProxy(0)
+        self._vision._subscribeToVideoProxy(1)
 
     def _updateBallInfo(self, img, xml, CameraID):
         """
@@ -93,13 +95,15 @@ class Analyse :
         :param cameraID:
         :return:
         """
-        xx = x/80
-        yy = y/60
-        if (cameraID == 0):
-            self._ballGridLocationTop = [xx, yy]
-        elif (cameraID == 1):
-            self._ballGridLocationBottom = [xx, yy]
-        return [xx, yy]
+        if (x != None and y!= None):
+
+            xx = x/80
+            yy = y/60
+            if (cameraID == 0):
+                self._ballGridLocationTop = [xx, yy]
+            elif (cameraID == 1):
+                self._ballGridLocationBottom = [xx, yy]
+            return [xx, yy]
 
     def _takeTopImage(self, xml):
         """
@@ -108,6 +112,7 @@ class Analyse :
         """
         img = self._vision._takeImage(0)
         self._updateBallInfo(img, xml, 0)
+        return img
 
     def _takeBottomImage(self, xml):
         """
@@ -116,7 +121,7 @@ class Analyse :
         """
         img = self._vision._takeImage(1)
         self._updateBallInfo(img, xml, 1)
-
+        return img
 
 class TestAnalyse(unittest.TestCase):
 
@@ -132,7 +137,7 @@ class TestAnalyse(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    #unittest.main()
 
     #Other tests below:
     """Testing updateBallCoordinates
@@ -144,19 +149,21 @@ if __name__ == "__main__":
     print(analyse._getBallCoordinates())
     print(time.time()-times)"""
 
-    """
+
     #Testing imageCapture on top camera
+    time.sleep(2)
     xml = 'C:\\Users\\Youssef\\Downloads\\ball_cascade.xml'
-    analyse = Analyse('172.27.96.32', 9559)
-    print(analyse._vision._videoProxy)
-    analyse._vision._subscribeToVideoProxy(0)
-    print(analyse._vision._imgClientTop)
-    print(analyse._vision._videoProxy)
-    naoimg = analyse._vision._takeImage(0)
-    analyse._updateBallCoordinates(naoimg, xml)
-    print(analyse._ballCoordinates)
-    print(analyse._ballGridLocation)
+    analyse = Analyse('127.0.0.1', 9559)
+    print(analyse._vision._videoProxy.getSubscribers())
+    #analyse._vision._unsubscribeAll()
+    naoimg = analyse._takeTopImage(xml)
+    #naoimg2 = analyse._takeBottomImage(xml)
+    print(analyse._ballCoordinatesTop)
+    cv2.imshow('naoimg',naoimg)
+    #cv2.imshow('naoimgbot',naoimg2)
+    analyse._vision._unsubscribeAll()
+    print(analyse._vision._videoProxy.getSubscribers())
+    print(analyse._ballCoordinatesTop)
+    cv2.waitKey()
+    cv2.destroyAllWindows()
     #cv2.imshow('NAOImage',naoimg)
-    #cv2.waitKey()
-    #cv2.destroyAllWindows()
-    """

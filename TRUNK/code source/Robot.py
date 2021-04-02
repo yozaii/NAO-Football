@@ -8,29 +8,30 @@ import Action
 from .serveur.clientside import Client
 from .Node import Point3D
 
+
+IP = '172.27.96.32'
+xml = 'C:\\Users\\Youssef\\Downloads\\ball_cascade.xml'
+pos = Point3D(0, 0, 0)
+
 class Robot:
     """ 
     class define every robot
     """
     PORT = 9559
-    pos = Point3D(0,0,0)
 
     def __init__(self,pos,ip,role):
-        self.__pos = pos
+        self.__pos = None
         self.__ip = ip
         self.__role = role
-        self.__analyse = Analyse.Analyse(ip,PORT)
+        self._analyse = Analyse.Analyse(ip,PORT)
         self.client = Client()
         self.__pos2 = None
         self.__pos3 = None
         self.__pos4 = None
         self.__pos5 = None
-
-
         # connection to the differentes modules
-        motionProxy = connectProxy("ALMotion")
-        postureProxy = connectProxy("ALRobotPosture")
-        vision = NVis(ip, PORT)
+        self._motionProxy = self.connectProxy(IP, "ALMotion")
+        self._postureProxy = self.connectProxy(IP, "ALRobotPosture")
 
         # talk with servor to know his role 
         
@@ -43,7 +44,7 @@ class Robot:
         The client robot access to the server (have to be tested)
         """
         self.client.connection()
-    
+
     def send_postition_to_team(self):
         """
         The client robot send his position to
@@ -59,7 +60,7 @@ class Robot:
         while self.client.is_connected:
             thread_listening = threading.Thread(target=self.listening)
             thread_listening.start()
-        
+
     def connectProxy(self,ip,module):
         """
         allows to connect the robot
@@ -87,61 +88,79 @@ class Robot:
         the ball. Once the ball is found, it moves its
         body to face the ball
         """
+        self._analyse._takeTopImage(xml)
+        self._analyse._takeBottomImage(xml)
         #While ball is not found
-        while (self.__analyse._ballAreaTop == -1 && self.__analyse._ballAreaBottom == -1):
-            Action.lookAround(motionProxy)
-            self.__analyse._takeTopImage(xml)
-            self.__analyse._takeBottomImage(xml)
+        while (self._analyse._ballAreaTop == -1 and self._analyse._ballAreaBottom == -1):
+            Action.lookAround(self._motionProxy)
+            self._analyse._takeTopImage(xml)
+            self._analyse._takeBottomImage(xml)
 
         #The robot and head face the ball
-        Action.turnBodyToHeadAngle(motionProxy)
+        Action.turnBodyToHeadAngle(self._motionProxy)
 
     def moveToBall(self):
         """
         The robot moves towards the ball
         :return: exit state. If ball is lost (0) or if ball is at robots feet(1)
         """
-        self.__analyse._takeBottomImage(xml)
+        x = 0.5
+        y = 0.0
+        z = 0.0
+        self._analyse._takeTopImage(xml)
 
         #While the ball is visible in the camera and it is not near the feet
-        while (self.__analyse._ballAreaBottom != -1 and
-               self.__analyse._ballGridLocationBottom[1] != [3,1] and
-               self.__analyse._ballGridLocationBottom[1] != [3,2]
+        while ((self._analyse._ballAreaBottom != -1 or self._analyse._ballAreaTop != 1) and
+               self._analyse._ballGridLocationBottom[1] != [3,1] and
+               self._analyse._ballGridLocationBottom[1] != [3,2]
         ):
             #An image is taken
-            self.__analyse._takeBottomImage(xml)
+            self._analyse._takeBottomImage(xml)
 
             #If the ball is perceived towards the right
-            if (self.__analyse._ballGridLocationBottom[1] == 3):
+            if (self._analyse._ballGridLocationBottom[1] == 3 or
+                self._analyse._ballGridLocationTop[1] == 3
+            ):
                 #The robot looks and moves towards the ball
-                Action.lookTowards(motionProxy, "Right")
-                Action.turnBodyToHeadAngle(motionProxy)
-                motionProxy.waitUntilMoveIsFinished()
-                motionProxy.post.moveTowards(1.0,0.0,0.0)
+                x = x - 0.2
+                z = z + 0.2
+                self._motionProxy.post.move(x,y,z)
 
             #if the ball is perceived towards the left
-            elif (self.__analyse._ballGridLocationBottom[1] == 0):
+            elif (self._analyse._ballGridLocationBottom[1] == 0 or
+                  self._analyse._ballGridLocationTop[1] == 3
+            ):
                 # The robot looks and moves towards the ball
-                Action.lookTowards(motionProxy, "Left")
-                Action.turnBodyToHeadAngle(motionProxy)
-                motionProxy.waitUntilMoveIsFinished()
-                motionProxy.post.moveTowards(1.0,0.0,0.0)
+                x = x - 0.2
+                z = z - 0.2
+                self._motionProxy.post.move(x,y,z)
 
             #If the ball is perceived around the center
             else:
-                motionProxy.post.moveTowards(1.0,0.0,0.0)
+                x = x + 0.2
+                z = 0.0
+                self._motionProxy.post.move(x,y,z)
 
-        motionProxy.stopMove()
+        self._motionProxy.stopMove()
 
         #If ball is lost return 0
-        if (self.__analyse._ballAreaBottom != -1):
+        if (self._analyse._ballAreaBottom != -1):
             return 0
         #If ball is at feet return 1
-        elif (self.__analyse._ballGridLocationBottom == [3,1] or
-               self.__analyse._ballGridLocationBottom ==[3,2]
+        elif (self._analyse._ballGridLocationBottom == [3,1] or
+               self._analyse._ballGridLocationBottom ==[3,2]
         ):
             return 1
 
 
+if __name__ == "__main__":
 
+
+    robot = Robot(pos,IP,'role')
+    robot.moveToBall()
+    ret = robot.moveToBall()
+    print(ret)
+    robot._analyse._vision._unsubscribeAll()
+
+    #Action.turnBodyToHeadAngle(robot._motionProxy)
 
