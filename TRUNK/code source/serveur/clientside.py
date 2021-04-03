@@ -67,75 +67,74 @@ class Client:
         return socket.gethostbyname(socket.gethostname())
 
 #-------------------------------------- Test connection to the robot -------------------------------------------------
-"""
-app = qi.Application(url="tcp://172.27.96.32:9559")
-app.start()
-session = app.session
-myClient = Client()
-id = session.registerService("Client", Client())
-robotClient = session.service("Client")
 
-networkProxy = ALProxy("ALConnectionManager", "172.27.96.32", 9559)
-networkProxy.connect(id)
-#app.run()
-print robotClient.returnIP()
-app.stop()
-"""
-"""
-parser = argparse.ArgumentParser()
-parser.add_argument("--ip", type=str, default="172.27.96.32",help="Robot IP address. On robot or Local Naoqi: use '127.0.0.1'.")
-parser.add_argument("--port", type=int, default=9559,help="Naoqi port number")
-args = parser.parse_args()
+def testConnectionToRobotWithQi_Application():
+    app = qi.Application(url="tcp://172.27.96.32:9559") #Connection to the robot with his IP and port
+    app.start()
+    session = app.session
+    myClient = Client()
+    serviceId = session.registerService("Client", MyClient) #We register the Client instance as a service that the robot will use 
+    robotClient = session.service("Client") #Using the service "Client" 
 
-networkProxy = ALProxy("ALConnectionManager", "172.27.96.32", 9559)
-session = qi.Session()
-session.connect("tcp://172.27.96.32:9559")
-serviceId = session.registerService("Client", Client())
-
-robotClient = session.service("Client")
-print robotClient
-#print robotClient.returnIp()
-
-#session.connect("tcp://" + args.ip + ":" + str(args.port))
-#robotClient = session.service("ALConnectionManager")
+    print robotClient.returnIP() #Normally return the robot adress IP
+    app.stop()
 
 
-#print serviceId
+def testConnectionToRobotWithSession():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--ip", type=str, default="172.27.96.32",help="Robot IP address. On robot or Local Naoqi: use '127.0.0.1'.")
+    parser.add_argument("--port", type=int, default=9559,help="Naoqi port number")
+    args = parser.parse_args()
 
-#robotClient.connect(serviceId)
-#print robotClient.returnIP
-"""
+    session = qi.Session()
+    session.connect("tcp://"+ args.ip +":" + str(args.port)) #Connect the session to the robot
+    myClient = Client()
+    serviceId = session.registerService("Client", MyClient) #Create an ID for the service Client()
+    networkProxy = session.service("ALConnectionManager") #Connection to the module "ALConnectionManager" from naoqi
+    serviceClient = networkProxy.connect(serviceId) #Connection to the service Client with his ID
+
+    print serviceClient.returnIP() #Normally return the robot adress IP
+
+def testConnectionToRobotWithALConnectionManager()
+    networkProxy = ALProxy("ALConnectionManager", "172.27.96.32", 9559) #Connect the module ALConnectionManager with the robot
+    networkProxy.connect()
+
 #-------------------------------------- Test Client -------------------------------------------------
-c1 = Client()
-c2 = Client()
-c1.connection()
-c2.connection()
-c1.send_message("Hello world")
-c2.send_message("Hello world 2")
+def testConnectionClients():
+    c1 = Client()
+    c2 = Client()
 
-c1.disconnection()
-c2.disconnection()
-"""
-c1 = Client()
-c2 = Client()
-c1.connection()
-c2.connection()
-#thread_listening1 = threading.Thread(target=c1.listening)
-#thread_listening2 = threading.Thread(target=c2.listening)
-#thread_listening1.start()
-#thread_listening2.start()
-print c1.port
-d= {1: "ptdr",2: "lol"} 
-c1.send_message("Hello world")
-c1.send_message(d)
-c2.send_message("Hello world 2")
-c2.send_message("Hello world 3")
-#c1.send_message(h)
-c1.disconnection()
-c2.disconnection()
-"""
+    c1.connection()
+    c2.connection()
+
+def testSend_message():
+    c1 = Client()
+    c2 = Client()
+
+    c1.send_message("Hello world")
+    c2.send_message("Hello world 2")
+    dictionnary = {1: "Test1", 2: "Test2"}
+    c2.send_message(d)
+    c1.send_message("Hello world3")
+
+def testListening():
+    """
+    Maybe use thread for not blocked the programm
+    """
+    c1 = Client()
+    c2 = Client()
+
+    c1.listening()
+    c2.listening()
+
+def testDisconnection():
+    c1 = Client()
+    c2 = Client()
+
+    c1.disconnection()
+    c2.disconnection()
+
 #-------------------------------------- Test Unitaires -------------------------------------------------
-"""
 class TestClient(unittest.TestCase):
     def setUp(self) -> None:
         self.c1 = Client()
@@ -156,4 +155,3 @@ class TestClient(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-"""
