@@ -26,48 +26,67 @@ except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
 
-class Ui_MainWindow(object):
-    def setupUi(self, MainWindow,listRole,listIp):
-        MainWindow.setObjectName(_fromUtf8("MainWindow"))
-        MainWindow.resize(664, 600)
-        self.MainWindow = MainWindow
+class Ui_MainWindow:
+    def __init__(self,listRole,listIp,coach):
+        self.coach = coach
         self.listRole = listRole
         self.listIp = listIp
-        self.centralwidget = QtGui.QWidget(MainWindow)
+        self.app = QtGui.QApplication(sys.argv)
+        self.MainWindow = QtGui.QMainWindow()
+        self.setupUi()
+        self.MainWindow.show()
+        sys.exit(self.app.exec_())
+
+    def setupUi(self):
+        self.MainWindow.setObjectName(_fromUtf8("MainWindow"))
+        self.MainWindow.resize(664, 600)
+
+        font = QtGui.QFont()
+        font.setPointSize(12)
+
+        self.centralwidget = QtGui.QWidget(self.MainWindow)
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
+
         self.verticalLayoutWidget = QtGui.QWidget(self.centralwidget)
         self.verticalLayoutWidget.setGeometry(QtCore.QRect(40, 90, 591, 441))
         self.verticalLayoutWidget.setObjectName(_fromUtf8("verticalLayoutWidget"))
+
         self.vbox = QtGui.QVBoxLayout(self.verticalLayoutWidget)
         self.vbox.setMargin(0)
         self.vbox.setObjectName(_fromUtf8("vbox"))
+
         self.listWidget = QtGui.QListWidget(self.verticalLayoutWidget)
         self.listWidget.setObjectName(_fromUtf8("listWidget"))
+        self.listWidget.setAlternatingRowColors(True)
+
         self.vbox.addWidget(self.listWidget)
+
         self.hbox = QtGui.QHBoxLayout()
         self.hbox.setObjectName(_fromUtf8("hbox"))
+
         spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.hbox.addItem(spacerItem)
+
         self.addButton = QtGui.QPushButton(self.verticalLayoutWidget)
-        font = QtGui.QFont()
-        font.setPointSize(12)
         self.addButton.setFont(font)
         self.addButton.setObjectName(_fromUtf8("addButton"))
         self.hbox.addWidget(self.addButton)
+
         spacerItem1 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.hbox.addItem(spacerItem1)
+
         self.vbox.addLayout(self.hbox)
+
         self.exit = QtGui.QPushButton(self.centralwidget)
         self.exit.setGeometry(QtCore.QRect(550, 560, 75, 23))
-        font = QtGui.QFont()
-        font.setPointSize(12)
         self.exit.setFont(font)
         self.exit.setObjectName(_fromUtf8("exit"))
-        MainWindow.setCentralWidget(self.centralwidget)
 
-        self.retranslateUi(MainWindow)
+        self.MainWindow.setCentralWidget(self.centralwidget)
+
+        self.retranslateUi(self.MainWindow)
         self.eventUI()
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        QtCore.QMetaObject.connectSlotsByName(self.MainWindow)
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow", None))
@@ -75,28 +94,23 @@ class Ui_MainWindow(object):
         self.exit.setText(_translate("MainWindow", "Exit", None))
 
     def eventUI(self):
-        self.exit.clicked.connect(app.quit)
+        self.exit.clicked.connect(self.app.quit)
         self.addButton.clicked.connect(self.add)
 
-    def test(self,ip,role):
-        print "IP: ", ip
-        print "Role: ",role
+    def connectRobot(self,ip,role):
+        self.coach.createPlayer(ip,role)
+        self.listWidget.addItem(ip)
 
     def add(self):
         self.addRobot = QtGui.QWidget()
-        self.ui = AddRobot()
-        self.ui.setupUi(self.addRobot,self.listIp,self.listRole)
+        self.addRobotWindow = AddRobot()
+        self.addRobotWindow.setupUi(self.addRobot,self.listIp,self.listRole)
         self.addRobot.setWindowModality(QtCore.Qt.ApplicationModal)
-        self.MainWindow.connect(self.addRobot, SIGNAL("connection(PyQt_PyObject,PyQt_PyObject)"), self.test)
+        self.MainWindow.connect(self.addRobot, SIGNAL("connection(PyQt_PyObject,PyQt_PyObject)"), self.connectRobot)
         self.addRobot.show()
 
 if __name__ == "__main__":
     listIp = ["127.0.0.1 ","172.96.26.32","172.96.26.33","172.96.26.34","172.96.26.35","172.96.26.36"]
     listRole = ["GOAL","RDEFENSE","LDEFENSE","RATTACKER","LATTACKER","MIDDLE"]
-    app = QtGui.QApplication(sys.argv)
-    MainWindow = QtGui.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow,listRole,listIp)
-    MainWindow.show()
-    sys.exit(app.exec_())
+    ui = Ui_MainWindow(listRole,listIp)
 

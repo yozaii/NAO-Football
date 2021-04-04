@@ -5,11 +5,10 @@ import sys
 import threading
 from naoqi import ALProxy
 import Action as action
-from serveur.clientside import Client
+#from serveur.clientside import Client
 from Analyse.Analyse import *
 from Node import *
 
-IP = '172.27.96.32'
 xml = 'C:\\Users\\Youssef\\Downloads\\ball_cascade.xml'
 
 class Robot:
@@ -22,16 +21,17 @@ class Robot:
         self.__pos = None
         self.__ip = ip
         self.__role = role
-        self._analyse = Analyse.Analyse(ip,PORT)
-        self.client = Client()
+        self._analyse = Analyse(ip,PORT)
+        #self.client = Client()
         self.__pos2 = None
         self.__pos3 = None
         self.__pos4 = None
         self.__pos5 = None
         # connection to the differentes modules
-        self._motionProxy = self.connectProxy(IP, "ALMotion")
-        self._postureProxy = self.connectProxy(IP, "ALRobotPosture")
-
+        self._motionProxy = self.connectProxy("ALMotion")
+        self._postureProxy = self.connectProxy("ALRobotPosture")
+        # we make him danse to know if his realy connected
+        action.danse(self._postureProxy,self._motionProxy)
         # talk with servor to know his role 
         
 
@@ -42,23 +42,26 @@ class Robot:
         """
         The client robot access to the server (have to be tested)
         """
-        self.client.connection()
+        pass
+        #self.client.connection()
 
     def send_postition_to_team(self):
         """
         The client robot send his position to
         the rest of the team (have to be tested)
         """
-        self.client.send_message(self.get_pos())
+        pass
+        #self.client.send_message(self.get_pos())
 
     def receive_position_of_team(self):
         """
         Receive the position of his teammate (have to be tested)
         (have to find a way to recup the position of each others robots)
         """
-        while self.client.is_connected:
-            thread_listening = threading.Thread(target=self.listening)
-            thread_listening.start()
+        pass
+        #while self.client.is_connected:
+         #   thread_listening = threading.Thread(target=self.listening)
+          #  thread_listening.start()
 
     def connectProxy(self,module):
         """
@@ -80,6 +83,7 @@ class Robot:
         """
         is the decisions in game of the robot
         """
+        pass
 
     def scanForBall(self):
         """

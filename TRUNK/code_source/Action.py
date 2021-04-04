@@ -22,7 +22,7 @@ def connect(module):
         print "Error was: ",e
 
 def RobotFellRecently( eventName, hasFallen, subscriberIdentifier):
-    print(hasFallen)
+    print hasFallen
     
 def shoot(postureProxy, motionProxy):
     """

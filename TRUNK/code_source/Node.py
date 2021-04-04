@@ -1,38 +1,40 @@
 #------------------------#
 #    Enumeration/node    #
 #------------------------#
-from enum import Enum, auto
+from enum import Enum
 
 
 class Role(Enum):
     """
     player role
     """
-
-    GOAL = auto()
-    RDEFENSE = auto()
-    LDEFENSE = auto()
-    RATTACKER = auto()
-    LATTACKER = auto()
-    MIDDLE = auto()
+    __order__ = "GOAL RDEFENSE LDEFENSE RATTACKER LATTACKER MIDDLE"
+    GOAL = 1
+    RDEFENSE = 2
+    LDEFENSE = 3
+    RATTACKER = 4
+    LATTACKER = 5
+    MIDDLE = 6
 
 
 class Element(Enum):
     """
     Element of court
     """
-    BALL = auto()
-    ALLY = auto()
-    ENEMY = auto()
-    CAGES = auto()
+    __order__ = "BALL ALLY ENEMY CAGES"
+    BALL = 1
+    ALLY = 2
+    ENEMY = 3
+    CAGES = 4
 
 class Strategy(Enum):
     """
     game strategy
     """
-    DEFAULT = auto()
-    ULTRA_OFFENSE = auto()
-    ULTRA_DEFENSE = auto()
+    __order__ = "DEFAULT ULTRA_OFFENSE ULTRA_DEFENSE"
+    DEFAULT = 1
+    ULTRA_OFFENSE = 2
+    ULTRA_DEFENSE = 3
 
 class Point3D:
     """

@@ -110,8 +110,8 @@ class AddRobot(object):
         self.exit.setText(_translate("Form", "cancel", None))
 
     def add(self):
-        self.addRobot.emit(SIGNAL("connection(PyQt_PyObject,PyQt_PyObject)"), unicode(self.boxIp.currentText()),unicode(self.boxRole.currentText()))
         self.addRobot.close()
+        self.addRobot.emit(SIGNAL("connection(PyQt_PyObject,PyQt_PyObject)"), unicode(self.boxIp.currentText()),unicode(self.boxRole.currentText()))
 
     def eventUI(self):
         self.addButton.clicked.connect(self.add)

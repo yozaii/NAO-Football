@@ -7,6 +7,7 @@
 import math
 import random
 from Node import *
+import Robot as ROBOT
 
 class Coach:
     """ 
@@ -16,15 +17,26 @@ class Coach:
     """
     def __init__(self):
 
-        self.__role = list(Role)
-        self.strat = Strategy.DEFAULT
+        self.__listeRole = ["GOAL","RDEFENSE","LDEFENSE","RATTACKER","LATTACKER","MIDDLE"]
+        self.__listIp = ["127.0.0.1 ","172.96.26.32","172.96.26.33","172.96.26.34","172.96.26.35","172.96.26.36"]
+        self.__strat = Strategy.DEFAULT
+
+    def createPlayer(self,ip,role):
+        """
+        create an instance of robot
+        """
+        self.ip = ip.encode('ascii','ignore')
+        self.ip = self.ip.replace(' ', '')
+        self.role = role.encode('ascii','ignore')
+        self.role = self.role.replace(' ', '')
+        robot = ROBOT.Robot(self.ip,self.role)
 
     def distribRole(self):
         """
         allows to give a role to the robot
         """
-        choice = random.choice(self.__role)
-        self.__role.remove(choice)
+        choice = random.choice(self.__listeRole)
+        self.__listeRole.remove(choice)
         return choice
 
     def isPresent(self,f,g,posElement):
@@ -107,8 +119,14 @@ class Coach:
 
         # must return list of robot that i can pass the ball
     
-    def get_role(self):
-        return self.__role
+    def get_listRole(self):
+        return self.__listeRole
+
+    def get_strat(self):
+        return self.__strat
+
+    def get_listIp(self):
+        return self.__listIp
 
 
 #******************     TEST Coach/Node    *********************#
@@ -160,10 +178,10 @@ def testDistribRole(oumar):
     print("test of dirstribRole() function")
     for i in range(6):
         oumar.distribRole()
-    if len(oumar.get_role()) == 0:
-        return print("success")
+    if len(oumar.get_listRole()) == 0:
+        print "success"
     else:
-        return print("failure")
+        print "failure"
 
 
 if __name__ == '__main__':
