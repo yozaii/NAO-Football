@@ -10,9 +10,10 @@ class TestAction(unittest.TestCase):
         self.module1 = "ALMotion"
         self.module2 = "ALRobotPosture"
         self.x =0
-        self.y=0
-        self.theta =0
+        self.y = 0
+        self.theta = 0
         self.degree = 0
+        self.time = 1
     
     def test_connect(self):
         self.assertEqual(self.module1,"ALMotion") or self.assertEqual(self.module2,"ALRobotPosture")
@@ -22,7 +23,10 @@ class TestAction(unittest.TestCase):
     def test_shoot(self):
         self.assertEqual(self.module1,"ALMotion") or self.assertEqual(self.module2,"ALRobotPosture")
 
-    def test_lSideShoot(self):
+    def test_leftSideShoot(self):
+        self.assertEqual(self.module1,"ALMotion") or self.assertEqual(self.module2,"ALRobotPosture")
+    
+    def test_rightSideShoot(self):
         self.assertEqual(self.module1,"ALMotion") or self.assertEqual(self.module2,"ALRobotPosture")
 
     def test_postureDeJeu(self):
@@ -45,6 +49,10 @@ class TestAction(unittest.TestCase):
         self.assertEqual(self.module1,"ALMotion")
         self.assertLess(self.degree, 360) 
 
+    def test_defense(self):
+        self.assertEqual(self.module1,"ALMotion")
+        self.assertGreater(self.time, 0.1)
+    
     
 
 if __name__ == '__main__':
