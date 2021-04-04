@@ -195,17 +195,18 @@ def danse(postureProxy, motionProxy):
     # Go to rest position
     motionProxy.rest()
 
+if __name__ == "__main__":
+    motionProxy = connect("ALMotion")
+    postureProxy = connect("ALRobotPosture")
+    #danse(postureProxy, motionProxy)
+    #get_up(postureProxy)
+    #turn(motionProxy, 40)
+    #walk(motionProxy,0.3,0,0)
+    #postureDeJeu(postureProxy, motionProxy)
+    #shoot(postureProxy,motionProxy)
+    #lSideShoot(postureProxy, motionProxy)
+    #rSideShoot(postureProxy, motionProxy)
+    #simpleShoot(postureProxy, motionProxy)
+    defense(postureProxy, motionProxy)
 
-motionProxy = connect("ALMotion")
-postureProxy = connect("ALRobotPosture")
-#danse(postureProxy, motionProxy)
-#get_up(postureProxy)
-#turn(motionProxy, 40)
-#walk(motionProxy,0.3,0,0)
-#postureDeJeu(postureProxy, motionProxy)
-#shoot(postureProxy,motionProxy)
-#lSideShoot(postureProxy, motionProxy)
-#rSideShoot(postureProxy, motionProxy)
-#simpleShoot(postureProxy, motionProxy)
-defense(postureProxy, motionProxy)
 
