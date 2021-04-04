@@ -1,17 +1,16 @@
 #------------------------#
 #     Classes Robot      #
 #------------------------#
+import sys
 import threading
 from naoqi import ALProxy
-import Analyse
-import Action
-from .serveur.clientside import Client
-from .Node import Point3D
-
+import Action as action
+from serveur.clientside import Client
+from Analyse.Analyse import *
+from Node import *
 
 IP = '172.27.96.32'
 xml = 'C:\\Users\\Youssef\\Downloads\\ball_cascade.xml'
-pos = Point3D(0, 0, 0)
 
 class Robot:
     """ 
@@ -19,7 +18,7 @@ class Robot:
     """
     PORT = 9559
 
-    def __init__(self,pos,ip,role):
+    def __init__(self,ip,role):
         self.__pos = None
         self.__ip = ip
         self.__role = role
@@ -61,12 +60,12 @@ class Robot:
             thread_listening = threading.Thread(target=self.listening)
             thread_listening.start()
 
-    def connectProxy(self,ip,module):
+    def connectProxy(self,module):
         """
         allows to connect the robot
         """
         try:
-            return ALProxy(module, ip, PORT)
+            return ALProxy(module, self.__ip, PORT)
         except Exception,e:
             print "Could not create proxy to ",module
             print "Error was: ",e
@@ -156,11 +155,11 @@ class Robot:
 if __name__ == "__main__":
 
 
-    robot = Robot(pos,IP,'role')
-    robot.moveToBall()
-    ret = robot.moveToBall()
-    print(ret)
-    robot._analyse._vision._unsubscribeAll()
+    robot = Robot("127.0.0.1",'role')
+    #robot.moveToBall()
+    #ret = robot.moveToBall()
+    #print(ret)
+    #robot._analyse._vision._unsubscribeAll()
 
     #Action.turnBodyToHeadAngle(robot._motionProxy)
 
