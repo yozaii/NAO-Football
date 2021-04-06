@@ -11,6 +11,7 @@ from PyQt4 import QtCore, QtGui
 from PyQt4.QtCore import SIGNAL
 import sys
 from addRobot import AddRobot
+from error import Error
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -31,6 +32,8 @@ class Ui_MainWindow:
         self.coach = coach
         self.listRole = listRole
         self.listIp = listIp
+        self.listIpConnected = []
+        self.listRoleChoose = []
         self.app = QtGui.QApplication(sys.argv)
         self.MainWindow = QtGui.QMainWindow()
         self.setupUi()
@@ -41,8 +44,8 @@ class Ui_MainWindow:
         self.MainWindow.setObjectName(_fromUtf8("MainWindow"))
         self.MainWindow.resize(664, 600)
 
-        font = QtGui.QFont()
-        font.setPointSize(12)
+        self.font = QtGui.QFont()
+        self.font.setPointSize(12)
 
         self.centralwidget = QtGui.QWidget(self.MainWindow)
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
@@ -58,6 +61,11 @@ class Ui_MainWindow:
         self.listWidget = QtGui.QListWidget(self.verticalLayoutWidget)
         self.listWidget.setObjectName(_fromUtf8("listWidget"))
         self.listWidget.setAlternatingRowColors(True)
+        self.item = QtGui.QListWidgetItem(self.listWidget)
+        self.listWidget.addItem(self.item)
+        self.reference = MyCustomWidget("IP","Role",self.listWidget)
+        self.item.setSizeHint(self.reference.minimumSizeHint())
+        self.listWidget.setItemWidget(self.item,self.reference)
 
         self.vbox.addWidget(self.listWidget)
 
@@ -68,7 +76,7 @@ class Ui_MainWindow:
         self.hbox.addItem(spacerItem)
 
         self.addButton = QtGui.QPushButton(self.verticalLayoutWidget)
-        self.addButton.setFont(font)
+        self.addButton.setFont(self.font)
         self.addButton.setObjectName(_fromUtf8("addButton"))
         self.hbox.addWidget(self.addButton)
 
@@ -79,7 +87,7 @@ class Ui_MainWindow:
 
         self.exit = QtGui.QPushButton(self.centralwidget)
         self.exit.setGeometry(QtCore.QRect(550, 560, 75, 23))
-        self.exit.setFont(font)
+        self.exit.setFont(self.font)
         self.exit.setObjectName(_fromUtf8("exit"))
 
         self.MainWindow.setCentralWidget(self.centralwidget)
@@ -94,12 +102,31 @@ class Ui_MainWindow:
         self.exit.setText(_translate("MainWindow", "Exit", None))
 
     def eventUI(self):
-        self.exit.clicked.connect(self.app.quit)
+        self.exit.clicked.connect(self.close)
         self.addButton.clicked.connect(self.add)
 
+    def close(self):
+        self.coach.stopThreads()
+        self.app.quit()
+
     def connectRobot(self,ip,role):
-        self.coach.createPlayer(ip,role)
-        self.listWidget.addItem(ip)
+        self.ip = ip.encode('ascii','ignore')
+        self.role = role.encode('ascii','ignore')
+
+        if self.coach.createPlayer(self.ip,self.role):
+            item = QtGui.QListWidgetItem(self.listWidget)
+            self.listWidget.addItem(item)
+            reference = MyCustomWidget(self.ip,self.role,self.listWidget)
+            item.setSizeHint(reference.minimumSizeHint())
+            self.listWidget.setItemWidget(item,reference)
+
+            self.listIpConnected.append(self.ip)
+            self.listIp.remove(self.ip)
+            self.listRoleChoose.append(self.role)
+            self.listRole.remove(self.role)
+        else:
+            # open the error window
+            self.errorWindow()
 
     def add(self):
         self.addRobot = QtGui.QWidget()
@@ -108,6 +135,26 @@ class Ui_MainWindow:
         self.addRobot.setWindowModality(QtCore.Qt.ApplicationModal)
         self.MainWindow.connect(self.addRobot, SIGNAL("connection(PyQt_PyObject,PyQt_PyObject)"), self.connectRobot)
         self.addRobot.show()
+
+    def errorWindow(self):
+        self.error = QtGui.QWidget()
+        self.errorWindow = Error()
+        self.errorWindow.setupUi(self.error)
+        self.error.setWindowModality(QtCore.Qt.ApplicationModal)
+        self.error.show()
+
+
+class MyCustomWidget(QtGui.QWidget):
+    def __init__(self, ip, role, parent=None):
+        super(MyCustomWidget, self).__init__(parent)
+
+        self.row = QtGui.QHBoxLayout()
+
+        self.row.addWidget(QtGui.QLabel(ip))
+        self.row.addWidget(QtGui.QLabel(role))
+
+        self.setLayout(self.row)
+
 
 if __name__ == "__main__":
     listIp = ["127.0.0.1 ","172.96.26.32","172.96.26.33","172.96.26.34","172.96.26.35","172.96.26.36"]

@@ -18,26 +18,28 @@ class Coach:
     def __init__(self):
 
         self.__listeRole = ["GOAL","RDEFENSE","LDEFENSE","RATTACKER","LATTACKER","MIDDLE"]
-        self.__listIp = ["127.0.0.1 ","172.96.26.32","172.96.26.33","172.96.26.34","172.96.26.35","172.96.26.36"]
+        self.__listIp = ["127.0.0.1","127.0.0.2","172.96.26.32","172.96.26.33","172.96.26.34","172.96.26.35","172.96.26.36"]
         self.__strat = Strategy.DEFAULT
+        self.listRobot = []
 
     def createPlayer(self,ip,role):
         """
         create an instance of robot
         """
-        self.ip = ip.encode('ascii','ignore')
-        self.ip = self.ip.replace(' ', '')
-        self.role = role.encode('ascii','ignore')
-        self.role = self.role.replace(' ', '')
-        robot = ROBOT.Robot(self.ip,self.role)
+        robot = ROBOT.Robot(ip,role,self.__strat,self)
+        self.listRobot.append(robot)
 
-    def distribRole(self):
-        """
-        allows to give a role to the robot
-        """
-        choice = random.choice(self.__listeRole)
-        self.__listeRole.remove(choice)
-        return choice
+        robot.start()
+        return robot.running
+
+
+    def stopThreads(self):
+        for robot in self.listRobot:
+            robot.stop()
+
+    def stopThread(self,robot):
+            robot.stop()
+
 
     def isPresent(self,f,g,posElement):
         """

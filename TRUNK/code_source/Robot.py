@@ -2,7 +2,7 @@
 #     Classes Robot      #
 #------------------------#
 import sys
-import threading
+from threading import Thread
 from naoqi import ALProxy
 import Action as action
 #from serveur.clientside import Client
@@ -11,32 +11,41 @@ from Node import *
 
 xml = 'C:\\Users\\Youssef\\Downloads\\ball_cascade.xml'
 
-class Robot:
+class Robot(Thread):
     """ 
     class define every robot
     """
     PORT = 9559
 
-    def __init__(self,ip,role):
+    def __init__(self,ip,role,strat,coach):
+        Thread.__init__(self)
+        self.__coach = coach
         self.__pos = None
         self.__ip = ip
         self.__role = role
-        self._analyse = Analyse(ip,PORT)
-        #self.client = Client()
-        self.__pos2 = None
-        self.__pos3 = None
-        self.__pos4 = None
-        self.__pos5 = None
-        # connection to the differentes modules
-        self._motionProxy = self.connectProxy("ALMotion")
-        self._postureProxy = self.connectProxy("ALRobotPosture")
-        # we make him danse to know if his realy connected
-        action.danse(self._postureProxy,self._motionProxy)
-        # talk with servor to know his role 
         
+        # connection to the differentes modules
+        self.tpMotion = self.connectProxy("ALMotion")
+        self.tpPosture = self.connectProxy("ALRobotPosture")
 
-        # take his place for his role
-        #moveTo(role.initPos)
+        self.running = self.tpMotion[0] and self.tpPosture[0]
+        if self.running:
+            self._motionProxy = self.tpMotion[1]
+            self._postureProxy = self.tpPosture[1]
+            self._analyse = Analyse(self.__ip,PORT)
+            
+
+    def stop(self):
+        self.running = False
+
+    def run(self):
+        """wait 10 sec"""
+        while self.running:
+            action.danse(self._postureProxy,self._motionProxy)
+            print "debut du robot: ", self.__ip 
+            time.sleep(10)
+            print "fin du robot: ", self.__ip
+            self.stop()
 
     def connectionServer(self):
         """
@@ -68,10 +77,12 @@ class Robot:
         allows to connect the robot
         """
         try:
-            return ALProxy(module, self.__ip, PORT)
+            
+            return True, ALProxy(module, self.__ip, PORT)
         except Exception,e:
             print "Could not create proxy to ",module
             print "Error was: ",e
+        return (False,)
 
     def get_pos(self):
         return self.__pos
@@ -79,11 +90,25 @@ class Robot:
     def set_pos(self,pos):
         self.__pos = pos
 
-    def IA(self):
+    def IA(self,gamePhase):
         """
         is the decisions in game of the robot
         """
-        pass
+        if gamePhase == Phase.PREGAME:
+            # declare his actual position as his origin/home
+            # move to his position according to his role and who engage the game and turn towards the ball
+            # wait a sound signal
+            self.IA(Phase.INGAME)
+
+        elif gamePhase == Phase.INGAME:
+            # engage the game or analyse where is the ball
+            # the closest robot move to the ball
+
+        elif gamePhase == Phase.PAUSE:
+
+        elif gamePhase == Phase.POSTGAME:
+
+
 
     def scanForBall(self):
         """
@@ -159,7 +184,7 @@ class Robot:
 if __name__ == "__main__":
 
 
-    robot = Robot("127.0.0.1",'role')
+    robot = Robot("faux",'role')
     #robot.moveToBall()
     #ret = robot.moveToBall()
     #print(ret)

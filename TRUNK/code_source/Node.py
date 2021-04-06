@@ -36,6 +36,16 @@ class Strategy(Enum):
     ULTRA_OFFENSE = 2
     ULTRA_DEFENSE = 3
 
+class Phase(Enum):
+    """
+    game phase
+    """
+    __order__ = "PREGAME INGAME PAUSE POSTGAME"
+    PREGAME = 1
+    INGAME = 2
+    PAUSE = 3
+    POSTGAME = 4
+
 class Point3D:
     """
     3d point

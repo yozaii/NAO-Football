@@ -195,6 +195,12 @@ def danse(postureProxy, motionProxy):
     # Go to rest position
     motionProxy.rest()
 
+def hey():
+    animation_player_service = session.service("ALAnimationPlayer")
+    tagToAnims = {}
+    tagToAnims["myNewTag1"] = ["animations/Stand/Gestures/Hey_1", "animations/Stand/Gestures/Hey_3"]
+    animation_player_service.addTagForAnimations(tagToAnims) 
+
 if __name__ == "__main__":
     motionProxy = connect("ALMotion")
     postureProxy = connect("ALRobotPosture")

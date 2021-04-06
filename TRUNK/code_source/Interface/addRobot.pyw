@@ -32,8 +32,8 @@ class AddRobot(object):
         self.addRobot.setObjectName(_fromUtf8("addRobot"))
         self.addRobot.resize(360, 144)
 
-        font = QtGui.QFont()
-        font.setPointSize(12)
+        self.font = QtGui.QFont()
+        self.font.setPointSize(12)
 
         self.verticalLayoutWidget = QtGui.QWidget(addRobot)
         self.verticalLayoutWidget.setGeometry(QtCore.QRect(5, 2, 350, 142))
@@ -48,23 +48,23 @@ class AddRobot(object):
 
         self.labelRobotIp = QtGui.QLabel(self.verticalLayoutWidget)
         
-        self.labelRobotIp.setFont(font)
+        self.labelRobotIp.setFont(self.font)
         self.labelRobotIp.setObjectName(_fromUtf8("labelRobotIp"))
         self.horizontalLayout.addWidget(self.labelRobotIp)
 
         self.boxIp = QtGui.QComboBox(self.verticalLayoutWidget)
-        self.boxIp.setFont(font)
+        self.boxIp.setFont(self.font)
         self.boxIp.setObjectName(_fromUtf8("boxIp"))
         self.boxIp.addItems(listIp)
         self.horizontalLayout.addWidget(self.boxIp)
 
         self.labelRole = QtGui.QLabel(self.verticalLayoutWidget)
-        self.labelRole.setFont(font)
+        self.labelRole.setFont(self.font)
         self.labelRole.setObjectName(_fromUtf8("labelRole"))
         self.horizontalLayout.addWidget(self.labelRole)
 
         self.boxRole = QtGui.QComboBox(self.verticalLayoutWidget)
-        self.boxRole.setFont(font)
+        self.boxRole.setFont(self.font)
         self.boxRole.setObjectName(_fromUtf8("boxRole"))
         self.boxRole.addItems(listRole)
         self.horizontalLayout.addWidget(self.boxRole)
@@ -75,12 +75,12 @@ class AddRobot(object):
 
 
         self.labelAdd = QtGui.QLabel(self.verticalLayoutWidget)
-        self.labelAdd.setFont(font)
+        self.labelAdd.setFont(self.font)
         self.labelAdd.setObjectName(_fromUtf8("labelAdd"))
         self.horizontalLayout_2.addWidget(self.labelAdd)
 
         self.addButton = QtGui.QPushButton(self.verticalLayoutWidget)
-        self.addButton.setFont(font)
+        self.addButton.setFont(self.font)
         self.addButton.setObjectName(_fromUtf8("addButton"))
         self.horizontalLayout_2.addWidget(self.addButton)
 
@@ -88,7 +88,7 @@ class AddRobot(object):
         self.horizontalLayout_2.addItem(spacerItem)
 
         self.exit = QtGui.QPushButton(self.verticalLayoutWidget)
-        self.exit.setFont(font)
+        self.exit.setFont(self.font)
         self.exit.setObjectName(_fromUtf8("exit"))
         self.horizontalLayout_2.addWidget(self.exit)
 
