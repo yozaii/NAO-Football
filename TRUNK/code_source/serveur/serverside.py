@@ -77,8 +77,8 @@ class Server:
         print "[ECOUTE] LE SERVEUR ECOUTE A L'ADRESSE "+str(Server.host)+ ","+str(Server.port)
         while True:
             socket_client, adresse_client = Server.server.accept()
-            if adresse_client not in Server.clients: #add the clients in a dynamic table
-                Server.clients.add(adresse_client)
+            if socket_client not in Server.clients: #add the clients in a dynamic table
+                Server.clients.add(socket_client)
             thread_connexion = threading.Thread(target=Server.client_connection, args=(socket_client, adresse_client))
             thread_connexion.start()
     
@@ -101,10 +101,10 @@ class Server:
                     is_connected = False
                     socket_client.send("Je te deconnecte".encode("utf8"))
                 else:
-                    #Server.broadcast(adresse_client, pickle.dumps(msg))
-                    socket_client.send("J'ai bien recu ton message".encode("utf8"))
+                    Server.broadcast(socket_client, pickle.dumps(msg))
+                    #socket_client.send("J'ai bien recu ton message".encode("utf8"))
         if adresse_client in Server.clients:
-            Server.clients.remove(adresse_client)
+            Server.clients.remove(socket_client)
         socket_client.close()
     
     client_connection = staticmethod(client_connection)
@@ -115,8 +115,8 @@ class Server:
         client has sent to the server
         """
         for client in Server.clients:
-            if adress_sender != client and not Server.clients:
-                Server.server.sendto(message_socket, client)
+            if adress_sender != client and len(Server.clients) != 0:
+                client.send(message_socket)
     
     broadcast = staticmethod(broadcast)
         

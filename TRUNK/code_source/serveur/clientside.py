@@ -50,7 +50,7 @@ class Client:
             msg_receiv = self.client_socket.recv(1024)
             if len(msg_receiv) > 0:
                 msg_receiv = pickle.loads(msg_receiv)
-                print msg_receiv
+                print "j'ai bien recu "+msg_receiv
 
     def disconnection(self):
         """
@@ -95,63 +95,70 @@ def testConnectionToRobotWithSession():
 
     print serviceClient.returnIP() #Normally return the robot adress IP
 
-def testConnectionToRobotWithALConnectionManager()
+def testConnectionToRobotWithALConnectionManager():
     networkProxy = ALProxy("ALConnectionManager", "172.27.96.32", 9559) #Connect the module ALConnectionManager with the robot
     networkProxy.connect()
 
 #-------------------------------------- Test Client -------------------------------------------------
-def testConnectionClients():
-    c1 = Client()
-    c2 = Client()
+c1 = Client()
+c2 = Client()
 
+def testConnectionClients():
+    """
+    test the connection to the server
+    """
     c1.connection()
     c2.connection()
 
 def testSend_message():
-    c1 = Client()
-    c2 = Client()
-
+    """
+    test the function send_message
+    with several messages
+    """
     c1.send_message("Hello world")
     c2.send_message("Hello world 2")
     dictionnary = {1: "Test1", 2: "Test2"}
-    c2.send_message(d)
+    c2.send_message(dictionnary)
     c1.send_message("Hello world3")
 
 def testListening():
     """
+    test the listening of clients
     Maybe use thread for not blocked the programm
     """
-    c1 = Client()
-    c2 = Client()
-
     c1.listening()
     c2.listening()
 
 def testDisconnection():
-    c1 = Client()
-    c2 = Client()
-
+    """
+    test the disconnection to the server
+    """
     c1.disconnection()
     c2.disconnection()
 
 #-------------------------------------- Test Unitaires -------------------------------------------------
 class TestClient(unittest.TestCase):
-    def setUp(self) -> None:
+    def setUp(self):
         self.c1 = Client()
         self.c2 = Client()
         return super().setUp()
 
     def test_connection_RaisesConnectionRefusedError(self):
-        self.assertRaises(ConnectionRefusedError, self.c1.connection)
+        self.assertRaises(Exception, self.c1.connection)
     
     def test_connection_RaisesIllegalArguments(self):
         self.assertRaises(Exception, self.c1.connection, "je veux une erreur de paramètre")
 
     def test_send_message_isNone(self):
         self.assertIsNone(self.c1.send_message)
-
+        
     def test_send_message_RaisesIllegalArguments(self):
         self.assertRaises(Exception, self.c1.send_message, (None, 2, "je veux une erreur de paramètre"))
 
+    def test_disconnection_RaisesIllegalArguments(self):
+        self.assertRaises(Exception, self.c1.disconnection, ("je veux une erreur de paramètre"))
+
+    def test_listening_RaisesIllegalArguments(self):
+        self.assertRaises(Exception, self.c1.listening, ("je veux une erreur de paramètre"))
 if __name__ == "__main__":
     unittest.main()
