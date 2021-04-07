@@ -7,6 +7,8 @@ from naoqi import ALProxy
 import vision_definitions
 import unittest
 
+IP = '172.27.96.32'
+PORT = 9559
 
 class NAOVision :
 
@@ -70,15 +72,46 @@ class NAOVision :
             if self._imgClientBottom != "":
                 self._videoProxy.unsubscribe(self._imgClientBottom)
 
+    def _unsubscribeAll(self):
+        """
+        Unregisters all naoqi video modules
+        :return:
+        """
+        self._videoProxy.unsubscribe("_clientBottom_0")
+        self._videoProxy.unsubscribe("_clientTop_0")
+
+        self._videoProxy.unsubscribe("_clientBottom_1")
+        self._videoProxy.unsubscribe("_clientTop_1")
+
+        self._videoProxy.unsubscribe("_clientBottom_2")
+        self._videoProxy.unsubscribe("_clientTop_2")
+
+        self._videoProxy.unsubscribe("_clientBottom_3")
+        self._videoProxy.unsubscribe("_clientTop_3")
+
+        self._videoProxy.unsubscribe("_clientBottom_4")
+        self._videoProxy.unsubscribe("_clientTop_4")
+
+        self._videoProxy.unsubscribe("_clientBottom_5")
+        self._videoProxy.unsubscribe("_clientTop_5")
+
+        self._videoProxy.unsubscribe("_clientBottom_6")
+        self._videoProxy.unsubscribe("_clientTop_6")
+
     def _takeImage(self, cameraID):
         """
         Retrieves a new image from Nao
         """
+        self._image = np.zeros([self._imgHeight, self._imgWidth, 3], dtype=np.uint8)
+
+        # This will contain an ALImage from NAO robot
+        self._alImage = None
+
         if (cameraID == 0):
-            self._alImage = self._videoProxy.post.getImageRemote(self._imgClientTop)
+            self._alImage = self._videoProxy.getImageRemote(self._imgClientTop)
         elif (cameraID == 1):
-            self._alImage = self._videoProxy.post.getImageRemote(self._imgClientBottom)
-        #still needs work to get proper dimensions
+            self._alImage = self._videoProxy.getImageRemote(self._imgClientBottom)
+
         self._image.data = self._alImage[6]
         return self._image
 
@@ -92,7 +125,8 @@ class TestNAOVision(unittest.TestCase):
         """
         nVis = NAOVision(IP, PORT)
         nVis._subscribeToVideoProxy(0)
-        self.assertNotEquals(nVis._imgClientTop, '')
+        self.assertNotEquals(nVis._imgClientTop, "")
+        nVis._unsubscribeAll()
 
 
     def testVideoSubscriptionBottom(self):
@@ -103,7 +137,8 @@ class TestNAOVision(unittest.TestCase):
         """
         nVis = NAOVision(IP, PORT)
         nVis._subscribeToVideoProxy(1)
-        self.assertNotEquals(nVis._imgClientBottom, '')
+        self.assertNotEquals(nVis._imgClientBottom, "")
+        nVis._unsubscribeAll()
 
 
     def testTakeImageTopDimensions(self):
@@ -115,6 +150,7 @@ class TestNAOVision(unittest.TestCase):
         nVis._subscribeToVideoProxy(1)
         nVis._takeImage(0)
         self.assertEqual(nVis._image.shape, (240L, 320L, 3L))
+        nVis._unsubscribeAll()
 
 
     #def testTakeImageBottom(self):

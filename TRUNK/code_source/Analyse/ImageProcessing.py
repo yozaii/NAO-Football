@@ -5,6 +5,9 @@ import unittest
 
 img = cv2.imread('C:\\Users\\Youssef\\Desktop\\Robocup Images\\1.jpg', 6)
 img2 = cv2.imread('C:\\Users\\Youssef\\Desktop\\Robocup Images\\Goal2.jpg')
+img3 = cv2.imread('C:\\Users\\Youssef\\Desktop\\Robocup Images\\Goal3.jpg')
+
+
 xml = 'C:\\Users\\Youssef\\Downloads\\ball_cascade.xml'
 
 class ImageProcessing :
@@ -83,28 +86,38 @@ class ImageProcessing :
         return infoList
 
     def findGoalRectangle(self, img):
-        pass
 
-    def houghOnGray(img, pointThresh):
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        cv2.imshow("gray before", gray)
+        cv2.medianBlur(gray, 3, gray)
+        ret, thresh = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY)
+        cv2.imshow('thresh',thresh)
+        edges = cv2.Canny(thresh, 50, 150)
+        cv2.imshow('canny', edges)
+        lines, points = imPr.houghOnGray(edges, 50)
+        res, houghVPoints = imPr.drawHoughLines(gray, lines, "Vertical")
+        print(houghVPoints)
+        cv2.imshow("res",res)
+        minAndMax = imPr.findVerticalExtr(houghVPoints)
+        print(minAndMax)
+        x1 = minAndMax[0]
+        x2 = minAndMax[1]
+        cv2.rectangle(img, (x1, 0), (x2, 500), (255, 0, 0), 2)
+        cv2.imshow("finally?", img)
+        cv2.waitKey()
+
+
+    def houghOnGray(self, img, pointThresh):
         """
         Performs houghLines on an image
         :param img: The grayscale image to be processed
         :param pointThresh: The threshhold of number of points in HougLines
-        :return res: The processed image with hough lines
         :return lines: The np array of hough lines
         :return npPoints : The np array of the hough line points
         """
         lines = cv2.HoughLines(img, 1, np.pi / 180, pointThresh)
-
-        res = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
-
         listPoints = []
 
-        npPoints = np.array(listPoints)
-        return res, lines, npPoints
-
-    def drawHoughLines(self, img, lines):
-        # Draw the lines
         if lines is not None:
             for i in range(0, len(lines)):
                 rho = lines[i][0][0]
@@ -116,9 +129,85 @@ class ImageProcessing :
                 pt1 = (int(x0 + 1000 * (-b)), int(y0 + 1000 * (a)))
                 pt2 = (int(x0 - 1000 * (-b)), int(y0 - 1000 * (a)))
                 listPoints.append([pt1, pt2])
-                cv2.line(res, pt1, pt2, (0, 0, 255), 3, cv2.LINE_AA)
 
-    #def
+        npPoints = np.array(listPoints)
+        return lines, npPoints
+
+    def drawHoughLines(self, img, lines, type):
+        """
+        :param img: The image to be processed
+        :param lines: A set of hough lines
+        :param type: "Vertical" or "Horizontal"
+        :return res: The matrix with colored on houghlines
+        :return points : An nparray of the points of the lines (Vertical or horizontal or all)
+        """
+        res = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+
+        pointsList = []
+
+        if lines is not None:
+            for i in range(0, len(lines)):
+                rho = lines[i][0][0]
+                theta = lines[i][0][1]
+                a = math.cos(theta)
+                b = math.sin(theta)
+                x0 = a * rho
+                y0 = b * rho
+                pt1 = (int(x0 + 1000 * (-b)), int(y0 + 1000 * (a)))
+                pt2 = (int(x0 - 1000 * (-b)), int(y0 - 1000 * (a)))
+                [x1, y1] = pt1
+                [x2, y2] = pt2
+                if x1 != x2:
+                    slope = (y2-y1)/(x2-x1)
+                else:
+                    slope = 9999
+                if type == "Vertical" or type == "":
+                    if math.fabs(slope) > 13:
+                        cv2.line(res, pt1, pt2, (0, 0, 255), 3, cv2.LINE_AA)
+                        pointsList.append([pt1, pt2])
+                if type == "Horizontal" or type == "":
+                    if math.fabs(slope) < 1:
+                        cv2.line(res, pt1, pt2, (0, 0, 255), 3, cv2.LINE_AA)
+                        pointsList.append([pt1, pt2])
+
+        points = np.array(pointsList)
+        return res, points
+
+    def findVerticalExtr(self, points):
+        """
+        Finds the vertical lines extremities from a set of hough lines
+        :param points: The points of the lines
+        :return: the indices of the min and max vertical lines
+        """
+        min = 100000
+        max = 0
+        for i in range(points.shape[0]):
+            y = (points[i][0][0] + points[i][1][0])/2
+            if y<=min:
+                min = y
+            if y>=max:
+                max = y
+
+        return [min,max]
+
+    def findHorizontalExtr(self, points):
+        """
+        Finds the horizontal lines extremities from a set of hough lines
+        :param points: The points of the lines
+        :return: the indices of the min and max horizontal lines
+        """
+        min = 100000
+        max = 0
+        for i in range(points.shape[0]):
+            x = points[i][0][1]
+            if x <= min:
+                min = x
+            if x >= max:
+                max = x
+
+        return [min, max]
+
+
 
 class TestImageProcessing(unittest.TestCase):
 
@@ -137,8 +226,35 @@ if __name__ == "__main__":
     #unittest.main()
 
     #Other tests below:
+    """
     imPr = ImageProcessing()
     imPr.findBallRectangle(img,xml)
     cv2.imshow('img',img)
     cv2.waitKey()
     cv2.destroyAllWindows()
+    """
+
+    """
+    imPr = ImageProcessing()
+    gray = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
+    cv2.imshow("gray before", gray)
+    cv2.medianBlur(gray, 3, gray)
+    cv2.imshow("gray after blur", gray)
+    ret, thresh = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY)
+    edges = cv2.Canny(thresh, 50, 150)
+    cv2.imshow('thtresh', thresh)
+    cv2.imshow('edges', edges)
+    lines, points = imPr.houghOnGray(edges, 100)
+    res, houghVPoints = imPr.drawHoughLines(gray, lines, "Vertical")
+    print(houghVPoints)
+    minAndMax = imPr.findVerticalExtr(houghVPoints)
+    print(minAndMax)
+    cv2.imshow("hough", res)
+    cv2.waitKey()
+    """
+    img3 = cv2.resize(img3, (640,480))
+    cv2.imshow('img3',img3)
+    cv2.waitKey()
+    imPr = ImageProcessing()
+    imPr.findGoalRectangle(img3)
+
