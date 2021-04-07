@@ -94,20 +94,26 @@ class Robot(Thread):
         """
         is the decisions in game of the robot
         """
-        if gamePhase == Phase.PREGAME:
-            # declare his actual position as his origin/home
-            # move to his position according to his role and who engage the game and turn towards the ball
+        if gamePhase == Phase.Initial:
+            # declare his actual position as his origin/home (function)
+            action.posturePlay()
             # wait a sound signal
-            self.IA(Phase.INGAME)
+            self.IA(Phase.Set)
 
-        elif gamePhase == Phase.INGAME:
+        elif gamePhase == Phase.Set:
             # engage the game or analyse where is the ball
-            # the closest robot move to the ball
+            # when NAO detect the ball the closest robot move to it
+            # verify if NAO get the ball
+            pass
 
-        elif gamePhase == Phase.PAUSE:
+        elif gamePhase == Phase.:
+            pass
 
-        elif gamePhase == Phase.POSTGAME:
+        elif gamePhase == Phase.:
+            pass
 
+        elif gamePhase == Phase.:
+            self.stop()
 
 
     def scanForBall(self):

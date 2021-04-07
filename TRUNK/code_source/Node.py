@@ -9,12 +9,12 @@ class Role(Enum):
     player role
     """
     __order__ = "GOAL RDEFENSE LDEFENSE RATTACKER LATTACKER MIDDLE"
-    GOAL = 1
-    RDEFENSE = 2
-    LDEFENSE = 3
-    RATTACKER = 4
-    LATTACKER = 5
-    MIDDLE = 6
+    GOAL = (1,)
+    RDEFENSE = (2,)
+    LDEFENSE = (3,)
+    RATTACKER = (4,)
+    LATTACKER = (5,)
+    MIDDLE = (6,)
 
 
 class Element(Enum):
@@ -40,11 +40,12 @@ class Phase(Enum):
     """
     game phase
     """
-    __order__ = "PREGAME INGAME PAUSE POSTGAME"
-    PREGAME = 1
-    INGAME = 2
-    PAUSE = 3
-    POSTGAME = 4
+    __order__ = "Initial Set Playing Penalized Finished"
+    Initial = 1
+    Set = 2
+    Playing = 3
+    Penalized = 4
+    Finished = 5
 
 class Point3D:
     """
