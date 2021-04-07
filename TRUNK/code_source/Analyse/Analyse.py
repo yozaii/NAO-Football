@@ -25,12 +25,17 @@ class Analyse :
         self._ballAreaTop = -1
         self._ballAreaBottom= -1
 
+        #Goal position attributes
+        self._goalLeftPost = -1
+        self._goalRightPost = -1
+        self._goalArea = -1
+
         self._vision = NVis(IP, PORT)
         self._imPr = ImPr()
 
+
+
         #Connects to top and bottom video cameras
-        #self._vision._unsubscribeToVideoProxy(0)
-        #self._vision._unsubscribeToVideoProxy(1)
         self._vision._subscribeToVideoProxy(0)
         self._vision._subscribeToVideoProxy(1)
 
@@ -123,6 +128,16 @@ class Analyse :
         self._updateBallInfo(img, xml, 1)
         return img
 
+    def _ballIsVisible(self):
+        """
+        A boolean function to check if ball to the is visible or not
+        :return: True if visible, False otherwise
+        """
+        if self._ballGridLocationTop == -1 and self._ballCoordinatesBottom == -1:
+            return False
+        else:
+            return True
+
 class TestAnalyse(unittest.TestCase):
 
     def testUpdateBallGridLocation(self):
@@ -137,7 +152,7 @@ class TestAnalyse(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    #unittest.main()
+    unittest.main()
 
     #Other tests below:
     """Testing updateBallCoordinates
