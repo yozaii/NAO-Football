@@ -16,8 +16,8 @@ class Analyse :
         self._ballCoordinatesTop = [-1, -1]
         self._ballCoordinatesBottom = [-1, -1]
 
-        #ballGridLocation is an int that gives the rough square where the
-        #ball's center is (values between 0 -> 15 inclusive)
+        #ballGridLocation is an int that gives the location of  the
+        #ball's center in a 4x4 grid (values between 0 -> 15 inclusive)
         self._ballGridLocationTop = [-1, -1]
         self._ballGridLocationBottom = [-1, -1]
 
@@ -28,6 +28,7 @@ class Analyse :
         #Goal position attributes
         self._goalLeftPost = -1
         self._goalRightPost = -1
+        self._goalTopPost = -1
         self._goalArea = -1
 
         self._vision = NVis(IP, PORT)
@@ -52,7 +53,7 @@ class Analyse :
         if (CameraID == 0):
 
             #If no ball is detected
-            if (len(ballInfo)<1):
+            if (ballInfo[0] == -1):
                 self._ballCoordinatesTop[0]= -1
                 self._ballCoordinatesTop[0]= -1
                 self._ballAreaTop = -1
@@ -71,7 +72,7 @@ class Analyse :
         elif (CameraID == 1):
 
             #If no ball is detected
-            if (len(ballInfo)<1):
+            if (ballInfo[0] == -1):
                 self._ballCoordinatesBottom[0]= -1
                 self._ballCoordinatesBottom[0]= -1
                 self._ballAreaBottom = -1
@@ -109,6 +110,19 @@ class Analyse :
             elif (cameraID == 1):
                 self._ballGridLocationBottom = [xx, yy]
             return [xx, yy]
+
+    def _updateGoalInfo(self, img):
+        """
+        Updates goal related attributes when taking an image
+        :param img:
+        :return:
+        """
+        goalInfo = self._imPr.findGoalRectangle()
+
+        self._goalLeftPost = goalInfo[0]
+        self._goalRightPost = goalInfo[1]
+        self._goalTopPost = goalInfo[2]
+
 
     def _takeTopImage(self, xml):
         """

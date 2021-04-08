@@ -6,6 +6,7 @@ import unittest
 img = cv2.imread('C:\\Users\\Youssef\\Desktop\\Robocup Images\\1.jpg', 6)
 img2 = cv2.imread('C:\\Users\\Youssef\\Desktop\\Robocup Images\\Goal2.jpg')
 img3 = cv2.imread('C:\\Users\\Youssef\\Desktop\\Robocup Images\\Goal3.jpg')
+img4 = cv2.imread('C:\\Users\\Youssef\\Desktop\\Robocup Images\\Goal4.jpg')
 
 
 xml = 'C:\\Users\\Youssef\\Downloads\\ball_cascade.xml'
@@ -25,7 +26,7 @@ class ImageProcessing :
             infoList[3] = length of rectangle
             infoList[4] = x of center of rectangle
             infoList[5] = y of center of rectangle
-            infoList[6] = center of rectangle
+            infoList[6] = area of rectangle
 
         """
         #showing source image
@@ -86,25 +87,59 @@ class ImageProcessing :
         return infoList
 
     def findGoalRectangle(self, img):
-
+        """
+        Draws a rectangle over the goal
+        :param img:
+        :return: a list -> goalInfoList with
+            goalInfoList[0] = Left post
+            goalInfoList[1] = Right post
+            goalInfoList[2] = Top post
+            goalInfoList[3] = #Area of rectangle
+        """
+        #Converts image to gray
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         cv2.imshow("gray before", gray)
+
+        #Blurs noise
         cv2.medianBlur(gray, 3, gray)
+
+        #Threshold to keep only dark-ish objects
         ret, thresh = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY)
         cv2.imshow('thresh',thresh)
+
+        #Edges detection
         edges = cv2.Canny(thresh, 50, 150)
         cv2.imshow('canny', edges)
-        lines, points = imPr.houghOnGray(edges, 50)
-        res, houghVPoints = imPr.drawHoughLines(gray, lines, "Vertical")
-        print(houghVPoints)
+
+        #Hough transform and resulting horizontal / vertical lines
+        lines, points = imPr.houghOnGray(edges, 30)
+        res, houghVPoints, houghHPoints = imPr.drawHoughLines(gray, lines)
+        print("vpoints: ", houghVPoints)
+        print("hpoints: ", houghHPoints)
+        print("allpoints ", )
         cv2.imshow("res",res)
-        minAndMax = imPr.findVerticalExtr(houghVPoints)
-        print(minAndMax)
-        x1 = minAndMax[0]
-        x2 = minAndMax[1]
-        cv2.rectangle(img, (x1, 0), (x2, 500), (255, 0, 0), 2)
+
+        #x coordinates of left and right posts
+        leftAndRightPosts = imPr.findVerticalExtr(houghVPoints)
+
+        #y coordinates of the top post
+        topPost = imPr.findHorizontalTop(houghHPoints)
+        print(leftAndRightPosts)
+        x1 = leftAndRightPosts[0]
+        x2 = leftAndRightPosts[1]
+        y1 = topPost
+        cv2.rectangle(img, (x1, y1), (x2, 250), (255, 0, 0), 2)
+
+        goalInfoList = [None] * 7
+
+        goalInfoList[0] = x1 #Left post
+        goalInfoList[1] = x2 #Right post
+        goalInfoList[2] = y1 #Top post
+        #goalInfoList[3] = #Area of rectangle
         cv2.imshow("finally?", img)
         cv2.waitKey()
+
+        return goalInfoList
 
 
     def houghOnGray(self, img, pointThresh):
@@ -133,18 +168,18 @@ class ImageProcessing :
         npPoints = np.array(listPoints)
         return lines, npPoints
 
-    def drawHoughLines(self, img, lines, type):
+    def drawHoughLines(self, img, lines):
         """
         :param img: The image to be processed
         :param lines: A set of hough lines
         :param type: "Vertical" or "Horizontal"
         :return res: The matrix with colored on houghlines
-        :return points : An nparray of the points of the lines (Vertical or horizontal or all)
+        :return vPoints : An nparray of the points of the vertical lines
         """
         res = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
 
-        pointsList = []
-
+        vPointsList = []
+        hPointsList = []
         if lines is not None:
             for i in range(0, len(lines)):
                 rho = lines[i][0][0]
@@ -158,54 +193,54 @@ class ImageProcessing :
                 [x1, y1] = pt1
                 [x2, y2] = pt2
                 if x1 != x2:
-                    slope = (y2-y1)/(x2-x1)
+                    slope = float(y2-y1)/float(x2-x1)
                 else:
                     slope = 9999
-                if type == "Vertical" or type == "":
-                    if math.fabs(slope) > 13:
-                        cv2.line(res, pt1, pt2, (0, 0, 255), 3, cv2.LINE_AA)
-                        pointsList.append([pt1, pt2])
-                if type == "Horizontal" or type == "":
-                    if math.fabs(slope) < 1:
-                        cv2.line(res, pt1, pt2, (0, 0, 255), 3, cv2.LINE_AA)
-                        pointsList.append([pt1, pt2])
+                #slope  of line = 13 is approx 85 degrees
+                if math.fabs(slope) > 13:
+                    cv2.line(res, pt1, pt2, (0, 0, 255), 3, cv2.LINE_AA)
+                    vPointsList.append([pt1, pt2])
+                if math.fabs(slope) < 0.1:
+                    cv2.line(res, pt1, pt2, (0, 0, 255), 3, cv2.LINE_AA)
+                    hPointsList.append([pt1, pt2])
 
-        points = np.array(pointsList)
-        return res, points
+        vPoints = np.array(vPointsList)
+        hPoints = np.array(hPointsList)
+        return res, vPoints, hPoints
 
     def findVerticalExtr(self, points):
         """
         Finds the vertical lines extremities from a set of hough lines
         :param points: The points of the lines
-        :return: the indices of the min and max vertical lines
+        :return: the x coordinates of the min and max vertical lines
         """
         min = 100000
         max = 0
         for i in range(points.shape[0]):
-            y = (points[i][0][0] + points[i][1][0])/2
-            if y<=min:
-                min = y
-            if y>=max:
-                max = y
+            x = (points[i][0][0] + points[i][1][0])/2
+            print(x)
+            if x<=min:
+                min = x
+            if x>=max:
+                max = x
 
         return [min,max]
 
-    def findHorizontalExtr(self, points):
+    def findHorizontalTop(self, points):
         """
-        Finds the horizontal lines extremities from a set of hough lines
+        Finds the highest horizontal line in the image
+        (Note that xy plane in opencv starts from the top,
+        y increases as you go down)
         :param points: The points of the lines
-        :return: the indices of the min and max horizontal lines
+        :return: the y coordinates of the top horizontal line
         """
-        min = 100000
-        max = 0
+        min = 10000
         for i in range(points.shape[0]):
-            x = points[i][0][1]
-            if x <= min:
-                min = x
-            if x >= max:
-                max = x
+            y = (points[i][0][1] + points[i][1][1])/2
+            if y <= min:
+                min = y
 
-        return [min, max]
+        return min
 
 
 
@@ -252,9 +287,23 @@ if __name__ == "__main__":
     cv2.imshow("hough", res)
     cv2.waitKey()
     """
-    img3 = cv2.resize(img3, (640,480))
-    cv2.imshow('img3',img3)
+
+
+    """
+    For tom:
+    img4 = cv2.resize(img4, (320,240))
+    cv2.imshow('img4',img4)
     cv2.waitKey()
     imPr = ImageProcessing()
-    imPr.findGoalRectangle(img3)
+    imPr.findGoalRectangle(img4)
+    """
+
+    imPr = ImageProcessing()
+    test = imPr.findBallRectangle(img2,xml)
+    cv2.imshow('img',img2)
+    print(test)
+    print(test[0])
+    cv2.waitKey()
+    cv2.destroyAllWindows()
+
 
