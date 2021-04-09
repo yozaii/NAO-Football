@@ -52,8 +52,16 @@ class TestAction(unittest.TestCase):
     def test_defense(self):
         self.assertEqual(self.module1,"ALMotion")
         self.assertGreater(self.time, 0.1)
-    
-    
+
+    def test_walkFaster(self):
+        self.assertEqual(self.module1,"ALMotion") and self.assertEqual(self.module2,"ALRobotPosture")
+
+    def test_testWalk(self):
+        self.assertEqual(self.module1,"ALMotion") and self.assertEqual(self.module2,"ALRobotPosture")
+
+    def test_stiffnessOn(self):
+        self.assertEqual(self.module1,"ALMotion") 
+
 
 if __name__ == '__main__':
     unittest.main()
