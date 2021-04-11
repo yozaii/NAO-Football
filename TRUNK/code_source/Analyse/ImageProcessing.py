@@ -7,7 +7,8 @@ img = cv2.imread('C:\\Users\\Youssef\\Desktop\\Robocup Images\\1.jpg', 6)
 img2 = cv2.imread('C:\\Users\\Youssef\\Desktop\\Robocup Images\\Goal2.jpg')
 img3 = cv2.imread('C:\\Users\\Youssef\\Desktop\\Robocup Images\\Goal3.jpg')
 img4 = cv2.imread('C:\\Users\\Youssef\\Desktop\\Robocup Images\\Goal4.jpg')
-
+img5 = cv2.imread('C:\\Users\\Youssef\\Desktop\\Robocup Images\\Goal5.jpg')
+img6 = cv2.imread('C:\\Users\\Youssef\\Desktop\\Robocup Images\\Goal6.jpg')
 
 xml = 'C:\\Users\\Youssef\\Downloads\\ball_cascade.xml'
 
@@ -94,10 +95,14 @@ class ImageProcessing :
             goalInfoList[0] = Left post
             goalInfoList[1] = Right post
             goalInfoList[2] = Top post
-            goalInfoList[3] = #Area of rectangle
+            goalInfoList[3] = Base of goal
+            goalInfoList[4] = Area of goal
         """
+        blueFilterImg = self.keepBlue(img)
+        cv2.imshow("after Blue filter",blueFilterImg)
+
         #Converts image to gray
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        gray = cv2.cvtColor(blueFilterImg, cv2.COLOR_BGR2GRAY)
         cv2.imshow("gray before", gray)
 
         #Blurs noise
@@ -112,32 +117,38 @@ class ImageProcessing :
         cv2.imshow('canny', edges)
 
         #Hough transform and resulting horizontal / vertical lines
-        lines, points = imPr.houghOnGray(edges, 30)
-        res, houghVPoints, houghHPoints = imPr.drawHoughLines(gray, lines)
-        print("vpoints: ", houghVPoints)
-        print("hpoints: ", houghHPoints)
-        print("allpoints ", )
+        lines, points = self.houghOnGray(edges, 30)
+        res, houghVPoints, houghHPoints = self.drawHoughLines(gray, lines)
         cv2.imshow("res",res)
 
         #x coordinates of left and right posts
-        leftAndRightPosts = imPr.findVerticalExtr(houghVPoints)
+        leftAndRightPosts = self.findVerticalExtr(houghVPoints)
 
         #y coordinates of the top post
-        topPost = imPr.findHorizontalTop(houghHPoints)
-        print(leftAndRightPosts)
+        topPost = self.findHorizontalTop(houghHPoints)
         x1 = leftAndRightPosts[0]
         x2 = leftAndRightPosts[1]
         y1 = topPost
-        cv2.rectangle(img, (x1, y1), (x2, 250), (255, 0, 0), 2)
+
+        #width between the two vertical posts
+        width = x2 - x1
+        #length of the vertical posts is slightly shorter than horizontal post
+        postLength = int(width * 0.8)
+        y2 = y1 + postLength
+
+
+        cv2.rectangle(img, (x1, y1), (x2, y2), (255, 0, 0), 2)
 
         goalInfoList = [None] * 7
 
         goalInfoList[0] = x1 #Left post
         goalInfoList[1] = x2 #Right post
         goalInfoList[2] = y1 #Top post
-        #goalInfoList[3] = #Area of rectangle
-        cv2.imshow("finally?", img)
+        goalInfoList[3] = y2#Base of goal
+        goalInfoList[4] = width * postLength#Area of rectangle
+        cv2.imshow("rectangle", img)
         cv2.waitKey()
+        cv2.destroyAllWindows()
 
         return goalInfoList
 
@@ -242,6 +253,22 @@ class ImageProcessing :
 
         return min
 
+    def keepBlue(self, img):
+        """
+        Filters all colors other than blue
+        """
+        res = img.copy()
+        for i in range(res.shape[0]):
+            for j in range(res.shape[1]):
+                b = res[i][j][0]
+                g = res[i][j][1]
+                r = res[i][j][2]
+                if ((r > 50 or g > 100) or (b<30 and g>100)):
+                    res[i][j][0] = 255
+                    res[i][j][1] = 255
+                    res[i][j][2] = 255
+
+        return res
 
 
 class TestImageProcessing(unittest.TestCase):
@@ -289,21 +316,17 @@ if __name__ == "__main__":
     """
 
 
-    """
-    For tom:
+    img2 = cv2.resize(img2, (320,240))
+    img3 = cv2.resize(img3, (320,240))
     img4 = cv2.resize(img4, (320,240))
-    cv2.imshow('img4',img4)
-    cv2.waitKey()
-    imPr = ImageProcessing()
-    imPr.findGoalRectangle(img4)
-    """
+    img5 = cv2.resize(img5, (320,240))
+    img6 = cv2.resize(img6, (320,240))
 
     imPr = ImageProcessing()
-    test = imPr.findBallRectangle(img2,xml)
-    cv2.imshow('img',img2)
-    print(test)
-    print(test[0])
-    cv2.waitKey()
-    cv2.destroyAllWindows()
+    imPr.findGoalRectangle(img2)
+    imPr.findGoalRectangle(img3)
+    imPr.findGoalRectangle(img4)
+    imPr.findGoalRectangle(img5)
+    imPr.findGoalRectangle(img6)
 
 

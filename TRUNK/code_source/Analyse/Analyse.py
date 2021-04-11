@@ -26,10 +26,16 @@ class Analyse :
         self._ballAreaBottom= -1
 
         #Goal position attributes
-        self._goalLeftPost = -1
-        self._goalRightPost = -1
-        self._goalTopPost = -1
+        self._goalLeftPostBase = [-1,-1]
+        self._goalRightPostBase = [-1, -1]
+        self._goalTopPostCenter = [-1,-1]
         self._goalArea = -1
+
+        #The posts grid location
+        self._goalLeftBaseGrid = [-1,-1]
+        self._goalRightBaseGrid = [-1,-1]
+        self._goalTopCenterGrid = [-1, -1]
+        self._goalCenterGrid = [-1,-1]
 
         self._vision = NVis(IP, PORT)
         self._imPr = ImPr()
@@ -119,18 +125,44 @@ class Analyse :
         """
         goalInfo = self._imPr.findGoalRectangle()
 
-        self._goalLeftPost = goalInfo[0]
-        self._goalRightPost = goalInfo[1]
-        self._goalTopPost = goalInfo[2]
+        self._goalLeftPostBase = [goalInfo[0],goalInfo[3]]
+        self._goalRightPostBase = [goalInfo[1],goalInfo[3]]
+        self._goalTopPost = [(goalInfo[1]+goalInfo[0])/2,goalInfo[2]]#Center of top post
+        self._goalArea = goalInfo[4]
+        self._updateGoalGridLocation(goalInfo[0],goalInfo[1],goalInfo[2],goalInfo[3])
 
+    def _updateGoalGridLocation(self, l, r, t, b):
+        """
+        This function updates the value of BallGridLocation
+        Returns the value of the square holding
+        the x and y pixels in an imaginary grid, with the grid having
+        16 squares (from 0->15). Will be called in updateBallCoordinates
+        :param x:
+        :param y:
+        :return:
+        """
+        if (l != None and r!= None and t!= None and b!= None):
+
+            left = l/80
+            right = r/80
+            top = t/60
+            bot = b/60
+
+            self._goalTopCenterGrid = [(left + right/2)][top]
+            self._goalLeftBaseGrid = [left][bot]
+            self._goalRightBaseGrid = [right][bot]
+            self._goalCenterGrid = [(left+right)/2][(top+bot)/2]
 
     def _takeTopImage(self, xml):
         """
         Takes an image using the top camera
-        and updates ball information accordingly
+        and updates ball and goal information accordingly.
+        Goal info is updated only when taking pictures from
+        top camera
         """
         img = self._vision._takeImage(0)
         self._updateBallInfo(img, xml, 0)
+        self._updateGoalInfo(img)
         return img
 
     def _takeBottomImage(self, xml):
