@@ -10,6 +10,8 @@ img4 = cv2.imread('C:\\Users\\Youssef\\Desktop\\Robocup Images\\Goal4.jpg')
 img5 = cv2.imread('C:\\Users\\Youssef\\Desktop\\Robocup Images\\Goal5.jpg')
 img6 = cv2.imread('C:\\Users\\Youssef\\Desktop\\Robocup Images\\Goal6.jpg')
 
+
+
 xml = 'C:\\Users\\Youssef\\Downloads\\ball_cascade.xml'
 
 class ImageProcessing :
@@ -229,7 +231,6 @@ class ImageProcessing :
         max = 0
         for i in range(points.shape[0]):
             x = (points[i][0][0] + points[i][1][0])/2
-            print(x)
             if x<=min:
                 min = x
             if x>=max:
@@ -281,11 +282,117 @@ class TestImageProcessing(unittest.TestCase):
         ImPr = ImageProcessing()
         self.assertEqual(len(ImPr.findBallRectangle(img, xml)), 7)
 
+
+    def testGoalDetectionTwo(self):
+        ImPr = ImageProcessing()
+        boolLeft = False
+        boolRight = False
+        boolTop = False
+        boolBot = False
+        boolArea = False
+
+        im2 = cv2.resize(img2, (320, 240))
+        res = ImPr.findGoalRectangle(im2)
+
+        if res[0]<=15 and res[0]>=0: boolLeft = True
+        if res[1]<=330 and res[1]>=310: boolRight = True
+        if res[2]<=67 and res[2]>=47: boolTop = True
+        if res[3]<=319 and res[3]>=299: boolBot = True
+        if res[4]<=79780 and res[4]>= 78980: boolArea = True
+
+        boolAll = boolLeft and boolRight and boolTop and boolBot and boolArea
+        self.assertEqual(True,boolAll)
+
+
+    def testGoalDetectionThree(self):
+        ImPr = ImageProcessing()
+        boolLeft = False
+        boolRight = False
+        boolTop = False
+        boolBot = False
+        boolArea = False
+
+        im3 = cv2.resize(img3, (320, 240))
+        res = ImPr.findGoalRectangle(im3)
+
+        if res[0] <= 53 and res[0] >= 33: boolLeft = True
+        if res[1] <= 325 and res[1] >= 305: boolRight = True
+        if res[2] <= 31 and res[2] >= 11: boolTop = True
+        if res[3] <= 248 and res[3] >= 228: boolBot = True
+        if res[4] <= 59424 and res[4] >= 58624: boolArea = True
+
+        boolAll = boolLeft and boolRight and boolTop and boolBot and boolArea
+        self.assertEqual(True, boolAll)
+
+
+    def testGoalDetectionFour(self):
+        ImPr = ImageProcessing()
+        boolLeft = False
+        boolRight = False
+        boolTop = False
+        boolBot = False
+        boolArea = False
+
+        im4 = cv2.resize(img4, (320, 240))
+        res = ImPr.findGoalRectangle(im4)
+
+        if res[0] <= 176 and res[0] >= 156: boolLeft = True
+        if res[1] <= 283 and res[1] >= 263: boolRight = True
+        if res[2] <= 33 and res[2] >= 13: boolTop = True
+        if res[3] <= 118 and res[3] >= 90: boolBot = True
+        if res[4] <= 9495 and res[4] >= 8695: boolArea = True
+
+        boolAll = boolLeft and boolRight and boolTop and boolBot and boolArea
+        self.assertEqual(True, boolAll)
+
+
+    def testGoalDetectionFive(self):
+        ImPr = ImageProcessing()
+        boolLeft = False
+        boolRight = False
+        boolTop = False
+        boolBot = False
+        boolArea = False
+
+        im5 = cv2.resize(img5, (320, 240))
+        res = ImPr.findGoalRectangle(im5)
+
+        if res[0] <= 49 and res[0] >= 29: boolLeft = True
+        if res[1] <= 141 and res[1] >= 121: boolRight = True
+        if res[2] <= 116 and res[2] >= 96: boolTop = True
+        if res[3] <= 189 and res[3] >= 169: boolBot = True
+        if res[4] <= 7116 and res[4] >= 6316: boolArea = True
+
+        boolAll = boolLeft and boolRight and boolTop and boolBot and boolArea
+        self.assertEqual(True, boolAll)
+
+
+    def testGoalDetectionSix(self):
+        ImPr = ImageProcessing()
+        boolLeft = False
+        boolRight = False
+        boolTop = False
+        boolBot = False
+        boolArea = False
+
+        im6 = cv2.resize(img6, (320, 240))
+        res = ImPr.findGoalRectangle(im6)
+
+        if res[0] <= 91 and res[0] >= 71: boolLeft = True
+        if res[1] <= 181 and res[1] >= 161: boolRight = True
+        if res[2] <= 23 and res[2] >= 3: boolTop = True
+        if res[3] <= 95 and res[3] >= 75: boolBot = True
+        if res[4] <= 6880 and res[4] >= 6080: boolArea = True
+
+        boolAll = boolLeft and boolRight and boolTop and boolBot and boolArea
+        self.assertEqual(True, boolAll)
+
+
     def testRandom(self):
         self.assertEqual(1,1)
 
 if __name__ == "__main__":
-    #unittest.main()
+    unittest.main()
 
     #Other tests below:
     """
@@ -323,10 +430,17 @@ if __name__ == "__main__":
     img6 = cv2.resize(img6, (320,240))
 
     imPr = ImageProcessing()
-    imPr.findGoalRectangle(img2)
-    imPr.findGoalRectangle(img3)
-    imPr.findGoalRectangle(img4)
-    imPr.findGoalRectangle(img5)
-    imPr.findGoalRectangle(img6)
+    two = imPr.findGoalRectangle(img2)
+    three = imPr.findGoalRectangle(img3)
+    four = imPr.findGoalRectangle(img4)
+    five = imPr.findGoalRectangle(img5)
+    six = imPr.findGoalRectangle(img6)
+
+    print("two: ", two)
+    print("three :", three)
+    print("four :", four)
+    print("five :", five)
+    print("six :", six)
+
 
 
