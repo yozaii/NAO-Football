@@ -3,50 +3,6 @@
 #------------------------#
 from enum import Enum
 
-
-class Role(Enum):
-    """
-    player role
-    """
-    __order__ = "GOAL RDEFENSE LDEFENSE RATTACKER LATTACKER MIDDLE"
-    GOAL = (1,)
-    RDEFENSE = (2,)
-    LDEFENSE = (3,)
-    RATTACKER = (4,)
-    LATTACKER = (5,)
-    MIDDLE = (6,)
-
-
-class Element(Enum):
-    """
-    Element of court
-    """
-    __order__ = "BALL ALLY ENEMY CAGES"
-    BALL = 1
-    ALLY = 2
-    ENEMY = 3
-    CAGES = 4
-
-class Strategy(Enum):
-    """
-    game strategy
-    """
-    __order__ = "DEFAULT ULTRA_OFFENSE ULTRA_DEFENSE"
-    DEFAULT = 1
-    ULTRA_OFFENSE = 2
-    ULTRA_DEFENSE = 3
-
-class Phase(Enum):
-    """
-    game phase
-    """
-    __order__ = "Initial Set Playing Penalized Finished"
-    Initial = 1
-    Set = 2
-    Playing = 3
-    Penalized = 4
-    Finished = 5
-
 class Point3D:
     """
     3d point
@@ -87,6 +43,51 @@ class Point3D:
 
     def set_y(self, z):
         self.__z = z
+
+
+class Role(Enum):
+    """
+    player role
+    """
+    __order__ = "GOAL RDEFENSE LDEFENSE RATTACKER LATTACKER MIDDLE"
+    GOAL = (1,Point3D(0,-4,0))
+    RDEFENSE = (2,Point3D(2,-3.35,0))
+    LDEFENSE = (3,Point3D(-2,-3.35,0))
+    RATTACKER = (4,Point3D(0.3,-3.35,0))
+    LATTACKER = (5,Point3D(-0.3,-3.35,0),Point3D(-0.3,-1,0))
+    MIDDLE = (6,Point3D(0.3,-3.35,0))
+
+
+class Element(Enum):
+    """
+    Element of court
+    """
+    __order__ = "BALL ALLY ENEMY CAGES"
+    BALL = 1
+    ALLY = 2
+    ENEMY = 3
+    CAGES = 4
+
+class Strategy(Enum):
+    """
+    game strategy
+    """
+    __order__ = "DEFAULT ULTRA_OFFENSE ULTRA_DEFENSE"
+    DEFAULT = 1
+    ULTRA_OFFENSE = 2
+    ULTRA_DEFENSE = 3
+
+class Phase(Enum):
+    """
+    game phase
+    """
+    __order__ = "Initial Set Playing Penalized Finished"
+    Initial = 1
+    Set = 2
+    Ready = 3
+    Playing = 4
+    Penalized = 5
+    Finished = 6
 
 class AffineFunction:
     """
@@ -168,3 +169,7 @@ class PerimeterSquare:
 
     def get_botRight(self):
         return self.__botRight
+
+if __name__ == "__main__":
+    goal = Role.GOAL
+    print goal[0], goal[1]

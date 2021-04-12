@@ -32,6 +32,9 @@ class Coach:
         robot.start()
         return robot.running
 
+    def ready(self):
+        for robot in self.listRobot:
+            robot.IA(Phase.Ready)
 
     def stopThreads(self):
         for robot in self.listRobot:

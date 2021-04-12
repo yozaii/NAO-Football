@@ -61,6 +61,7 @@ class Ui_MainWindow:
         self.listWidget = QtGui.QListWidget(self.verticalLayoutWidget)
         self.listWidget.setObjectName(_fromUtf8("listWidget"))
         self.listWidget.setAlternatingRowColors(True)
+
         self.item = QtGui.QListWidgetItem(self.listWidget)
         self.listWidget.addItem(self.item)
         self.reference = MyCustomWidget("IP","Role",self.listWidget)
@@ -79,6 +80,16 @@ class Ui_MainWindow:
         self.addButton.setFont(self.font)
         self.addButton.setObjectName(_fromUtf8("addButton"))
         self.hbox.addWidget(self.addButton)
+
+        self.readyButton = QtGui.QPushButton(self.verticalLayoutWidget)
+        self.readyButton.setFont(self.font)
+        self.readyButton.setObjectName(_fromUtf8("readyButton"))
+        self.hbox.addWidget(self.readyButton)
+
+        self.disconnectButton = QtGui.QPushButton(self.verticalLayoutWidget)
+        self.disconnectButton.setFont(self.font)
+        self.disconnectButton.setObjectName(_fromUtf8("disconnectButton"))
+        self.hbox.addWidget(self.disconnectButton)
 
         spacerItem1 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.hbox.addItem(spacerItem1)
@@ -99,11 +110,15 @@ class Ui_MainWindow:
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow", None))
         self.addButton.setText(_translate("MainWindow", "Add Robot", None))
+        self.readyButton.setText(_translate("MainWindow", "Ready", None))
+        self.disconnectButton.setText(_translate("MainWindow", "Disconnect", None))
         self.exit.setText(_translate("MainWindow", "Exit", None))
 
     def eventUI(self):
         self.exit.clicked.connect(self.close)
         self.addButton.clicked.connect(self.add)
+        self.readyButton.clicked.connect(self.add)
+        self.disconnectButton.clicked.connect(self.disconnect)
 
     def close(self):
         self.coach.stopThreads()
@@ -143,21 +158,25 @@ class Ui_MainWindow:
         self.error.setWindowModality(QtCore.Qt.ApplicationModal)
         self.error.show()
 
+    def disconnect(self):
+        print self.item.listWidget().currentItem().get_ip()
 
 class MyCustomWidget(QtGui.QWidget):
     def __init__(self, ip, role, parent=None):
         super(MyCustomWidget, self).__init__(parent)
-
+        self.ip = ip
         self.row = QtGui.QHBoxLayout()
-
-        self.row.addWidget(QtGui.QLabel(ip))
+        self.row.addWidget(QtGui.QLabel(self.ip))
         self.row.addWidget(QtGui.QLabel(role))
-
         self.setLayout(self.row)
+
+    def get_ip():
+        return self.ip
+
 
 
 if __name__ == "__main__":
     listIp = ["127.0.0.1 ","172.96.26.32","172.96.26.33","172.96.26.34","172.96.26.35","172.96.26.36"]
     listRole = ["GOAL","RDEFENSE","LDEFENSE","RATTACKER","LATTACKER","MIDDLE"]
-    ui = Ui_MainWindow(listRole,listIp)
+    ui = Ui_MainWindow(listRole,listIp,coach.Coach())
 

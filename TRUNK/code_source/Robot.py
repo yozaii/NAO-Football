@@ -19,20 +19,24 @@ class Robot(Thread):
 
     def __init__(self,ip,role,strat,coach):
         Thread.__init__(self)
-        self.__coach = coach
-        self.__pos = None
-        self.__ip = ip
-        self.__role = role
+        self.coach = coach
+        self.pos = None
+        self.ip = ip
+        self.role = role
+        #self.state = Phase.Initial
         
         # connection to the differentes modules
         self.tpMotion = self.connectProxy("ALMotion")
         self.tpPosture = self.connectProxy("ALRobotPosture")
+        self.tpLed = self.connectProxy("ALLeds")
 
-        self.running = self.tpMotion[0] and self.tpPosture[0]
+        # booleane to confirm if every proxy are available
+        self.running = self.tpMotion[0] and self.tpPosture[0] and self.tpLed[0]
         if self.running:
-            self._motionProxy = self.tpMotion[1]
-            self._postureProxy = self.tpPosture[1]
-            self._analyse = Analyse(self.__ip,PORT)
+            self.motionProxy = self.tpMotion[1]
+            self.postureProxy = self.tpPosture[1]
+            self.ledProxy = self.tpLed[1]
+            self.analyse = Analyse(self.ip,PORT)
             
 
     def stop(self):
@@ -41,10 +45,7 @@ class Robot(Thread):
     def run(self):
         """wait 10 sec"""
         while self.running:
-            action.danse(self._postureProxy,self._motionProxy)
-            print "debut du robot: ", self.__ip 
-            time.sleep(10)
-            print "fin du robot: ", self.__ip
+            self.IA(Phase.Initial)
             self.stop()
 
     def connectionServer(self):
@@ -78,41 +79,59 @@ class Robot(Thread):
         """
         try:
             
-            return True, ALProxy(module, self.__ip, PORT)
+            return True, ALProxy(module, self.ip, PORT)
         except Exception,e:
             print "Could not create proxy to ",module
             print "Error was: ",e
         return (False,)
 
     def get_pos(self):
-        return self.__pos
+        return self.pos
 
     def set_pos(self,pos):
-        self.__pos = pos
+        self.pos = pos
 
     def IA(self,gamePhase):
         """
         is the decisions in game of the robot
         """
         if gamePhase == Phase.Initial:
+            # BLUE COLOR
+            names = ["ChestBoard/Led/Blue/Actuator/Value"]
+            self.ledProxy.createGroup("MyGroup",names)
+            self.ledProxy.on("MyGroup")
             # declare his actual position as his origin/home (function)
-            action.posturePlay()
-            # wait a sound signal
+            #action.posturePlay()
+            # try
+            self.kickOff = True
             self.IA(Phase.Set)
 
         elif gamePhase == Phase.Set:
-            # engage the game or analyse where is the ball
-            # when NAO detect the ball the closest robot move to it
-            # verify if NAO get the ball
+            # YELLOW COLOR
+            if self.kickOff:
+                if self.role == Role.LATTACKER:
+                    pass
+                    #action.moveTo(Role[2])
+                else:
+                    pass
+                    #action.moveTo(Role[1])
+            # turn to be in front of the enemy goal
+            #action.turn(self.motionProxy,50)
+
+        elif gamePhase == Phase.Ready:
+            # GREEN COLOR
+            self.analyse.waitSignal()
+            
+
+        elif gamePhase == Phase.Playing:
             pass
 
-        elif gamePhase == Phase.:
-            pass
+        elif gamePhase == Phase.Penalized:
+            # RED COLOR
+            time.sleep(40)
+            self.IA(Phase.Ready)
 
-        elif gamePhase == Phase.:
-            pass
-
-        elif gamePhase == Phase.:
+        elif gamePhase == Phase.Finished:
             self.stop()
 
 
@@ -122,16 +141,16 @@ class Robot(Thread):
         the ball. Once the ball is found, it moves its
         body to face the ball
         """
-        self._analyse._takeTopImage(xml)
-        self._analyse._takeBottomImage(xml)
+        self.analyse._takeTopImage(xml)
+        self.analyse._takeBottomImage(xml)
         #While ball is not found
-        while (self._analyse._ballAreaTop == -1 and self._analyse._ballAreaBottom == -1):
-            Action.lookAround(self._motionProxy)
-            self._analyse._takeTopImage(xml)
-            self._analyse._takeBottomImage(xml)
+        while (self.analyse._ballAreaTop == -1 and self.analyse._ballAreaBottom == -1):
+            Action.lookAround(self.motionProxy)
+            self.analyse._takeTopImage(xml)
+            self.analyse._takeBottomImage(xml)
 
         #The robot and head face the ball
-        Action.turnBodyToHeadAngle(self._motionProxy)
+        Action.turnBodyToHeadAngle(self.motionProxy)
 
     def moveToBall(self):
         """
@@ -141,19 +160,19 @@ class Robot(Thread):
         x = 0.5
         y = 0.0
         z = 0.0
-        self._analyse._takeTopImage(xml)
+        self.analyse._takeTopImage(xml)
 
         #While the ball is visible in the camera and it is not near the feet
-        while ((self._analyse._ballAreaBottom != -1 or self._analyse._ballAreaTop != 1) and
-               self._analyse._ballGridLocationBottom[1] != [3,1] and
-               self._analyse._ballGridLocationBottom[1] != [3,2]
+        while ((self.analyse._ballAreaBottom != -1 or self.analyse._ballAreaTop != 1) and
+               self.analyse._ballGridLocationBottom[1] != [3,1] and
+               self.analyse._ballGridLocationBottom[1] != [3,2]
         ):
             #An image is taken
-            self._analyse._takeBottomImage(xml)
+            self.analyse._takeBottomImage(xml)
 
             #If the ball is perceived towards the right
-            if (self._analyse._ballGridLocationBottom[1] == 3 or
-                self._analyse._ballGridLocationTop[1] == 3
+            if (self.analyse._ballGridLocationBottom[1] == 3 or
+                self.analyse._ballGridLocationTop[1] == 3
             ):
                 #The robot looks and moves towards the ball
                 x = x - 0.2
@@ -161,28 +180,28 @@ class Robot(Thread):
                 self._motionProxy.post.move(x,y,z)
 
             #if the ball is perceived towards the left
-            elif (self._analyse._ballGridLocationBottom[1] == 0 or
-                  self._analyse._ballGridLocationTop[1] == 3
+            elif (self.analyse._ballGridLocationBottom[1] == 0 or
+                  self.analyse._ballGridLocationTop[1] == 3
             ):
                 # The robot looks and moves towards the ball
                 x = x - 0.2
                 z = z - 0.2
-                self._motionProxy.post.move(x,y,z)
+                self.motionProxy.post.move(x,y,z)
 
             #If the ball is perceived around the center
             else:
                 x = x + 0.2
                 z = 0.0
-                self._motionProxy.post.move(x,y,z)
+                self.motionProxy.post.move(x,y,z)
 
-        self._motionProxy.stopMove()
+        self.motionProxy.stopMove()
 
         #If ball is lost return 0
-        if (self._analyse._ballAreaBottom != -1):
+        if (self.analyse._ballAreaBottom != -1):
             return 0
         #If ball is at feet return 1
-        elif (self._analyse._ballGridLocationBottom == [3,1] or
-               self._analyse._ballGridLocationBottom ==[3,2]
+        elif (self.analyse._ballGridLocationBottom == [3,1] or
+               self.analyse._ballGridLocationBottom ==[3,2]
         ):
             return 1
 
