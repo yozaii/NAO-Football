@@ -1,10 +1,12 @@
-import numpy as np
+import numpy
 from naoqi import ALProxy
+from subprocess import check_output
+"""
 import matplotlib.pyplot as plt
 import librosa
 import librosa.display
 import unittest
-
+"""
 
 class NAOAudio:
     def __init__(self, IP = "127.0.0.1", PORT = 9559):
@@ -48,13 +50,13 @@ class SignalAudio:
     def __init__(self):
         #path of the audio file format .wav
         self.__whistle_file = None
-
+        self.__soundDetected = None
         # spectrogram of recorded whistles
         self.__whistleBegin = 2000
         self.__whistleEnd = 4000
         self.__sampleRate = 48000
 
-        #
+        #Audio file transform into sample frequency
         self.__samplingFrequency = None
         
     def setAudioFile(self, path =""):
@@ -83,4 +85,4 @@ class SignalAudio:
         """
         A technique used to adjust the volume of audio files to a standard set level
         """
-        return sklearn.preprocessing.minmax_scale(self.__samplingFrequency, axis=axis)
+        return sklearn.preprocessing.minmax_scale(self.__samplingFrequency, axis=axis) #return the transformed __samplingFrequency 
