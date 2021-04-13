@@ -108,7 +108,7 @@ class Ui_MainWindow:
         QtCore.QMetaObject.connectSlotsByName(self.MainWindow)
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow", None))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Robot Interface", None))
         self.addButton.setText(_translate("MainWindow", "Add Robot", None))
         self.readyButton.setText(_translate("MainWindow", "Ready", None))
         self.disconnectButton.setText(_translate("MainWindow", "Disconnect", None))
@@ -117,7 +117,7 @@ class Ui_MainWindow:
     def eventUI(self):
         self.exit.clicked.connect(self.close)
         self.addButton.clicked.connect(self.add)
-        self.readyButton.clicked.connect(self.add)
+        self.readyButton.clicked.connect(self.takeReady)
         self.disconnectButton.clicked.connect(self.disconnect)
 
     def close(self):
@@ -153,27 +153,33 @@ class Ui_MainWindow:
 
     def errorWindow(self):
         self.error = QtGui.QWidget()
-        self.errorWindow = Error()
-        self.errorWindow.setupUi(self.error)
+        errorWindow = Error()
+        errorWindow.setupUi(self.error)
         self.error.setWindowModality(QtCore.Qt.ApplicationModal)
         self.error.show()
 
     def disconnect(self):
-        print self.item.listWidget().currentItem().get_ip()
+        selectedIp = self.listWidget.itemWidget(self.listWidget.currentItem()).ip
+        selectedRole = self.listWidget.itemWidget(self.listWidget.currentItem()).role
+        if self.coach.stopThread(selectedIp):
+            self.listIpConnected.remove(selectedIp)
+            self.listIp.append(selectedIp)
+            self.listRoleChoose.remove(selectedRole)
+            self.listRole.append(selectedRole)
+
+
+    def takeReady(self):
+        self.coach.ready()
 
 class MyCustomWidget(QtGui.QWidget):
     def __init__(self, ip, role, parent=None):
         super(MyCustomWidget, self).__init__(parent)
         self.ip = ip
+        self.role = role
         self.row = QtGui.QHBoxLayout()
         self.row.addWidget(QtGui.QLabel(self.ip))
         self.row.addWidget(QtGui.QLabel(role))
         self.setLayout(self.row)
-
-    def get_ip():
-        return self.ip
-
-
 
 if __name__ == "__main__":
     listIp = ["127.0.0.1 ","172.96.26.32","172.96.26.33","172.96.26.34","172.96.26.35","172.96.26.36"]
