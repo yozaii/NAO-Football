@@ -1,6 +1,4 @@
-#------------------------#
-#     Classes Robot      #
-#------------------------#
+#-*- coding: utf-8 -*-
 import sys
 import threading
 from naoqi import ALProxy
@@ -20,7 +18,7 @@ class Robot(threading.Thread):
 
     def __init__(self,ip,role,strat,coach):
         threading.Thread.__init__(self)
-        self._stopevent = threading.Event( )
+        self.arretthread = False
         self.coach = coach
         self.pos = None
         self.ip = ip
@@ -41,16 +39,25 @@ class Robot(threading.Thread):
             self.analyse = Analyse(self.ip,PORT)
 
     def stop(self):
-        self.running = False
-        self._stopevent.set()
-        
+        self.arretthread = True
+
+    def trace(self, frame, event, arg):
+        if event=='line':
+            if self.arretthread:
+                raise SystemExit()
+        return self.trace
 
     def run(self):
-        while self.running and not self._stopevent.isSet():
-            self.IA(Phase.Initial)
-            self.IA(Phase.Ready)
-            self._stopevent.wait(2.0)
-            
+        if self.running:
+            try:
+                sys.settrace(self.trace)
+                action.danse(self.postureProxy,self.motionProxy)
+                self.IA(Phase.Initial)
+                self.IA(Phase.Ready)
+
+                sys.settrace(None)
+            except:
+                sys.settrace(None)
 
     def connectProxy(self,module):
         """
@@ -127,8 +134,6 @@ class Robot(threading.Thread):
 
         elif gamePhase == Phase.Finished:
             self.stop()
-
-        self._stopevent.wait(2.0)
 
     def scanForBall(self):
         """
