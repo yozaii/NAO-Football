@@ -1,5 +1,6 @@
 from subprocess import check_output
 import numpy
+import sys 
 
 class SignalAudio():
     def __init__(self):
@@ -22,19 +23,6 @@ class SignalAudio():
     def getFingerprint_target(self):
         return self.__fingerprint_target
     
-    def calculate_fingerprints(self, filename):
-        """
-        The audio file is digitized into a list of integer after being sampled at a particular sample rate
-        """
-        fpcalc_out = check_output('fpcalc -raw -length %i %s'
-                                        % (self.__sample_rate, filename), shell=True)
-        fingerprint_index = fpcalc_out.find('FINGERPRINT=') + 12
-
-        # convert fingerprint to list of integers
-        fingerprints = map(int, fpcalc_out[fingerprint_index:].split(','))
-        
-        return fingerprints
-
     def correlate(self, source, target):
         """
         Initialise the sound receive by the robot (target) and the original whistle sound (source)
@@ -45,6 +33,24 @@ class SignalAudio():
         corr = self.compare(self.__fingerprint_source, self.__fingerprint_target)
         print corr
         max_corr_offset = self.get_max_corr(corr, source, target)
+    
+    def calculate_fingerprints(self, filename):
+        """
+        The audio file is digitized into a list of integer after being sampled at a particular sample rate
+        """
+        try:
+            fpcalc_out = check_output('fpcalc -raw -length %i %s'
+                                            % (self.__sample_rate, filename), shell=True)
+        except Exception,e:
+            print "One of the audio file is too short."
+            sys.exit(1)
+
+        fingerprint_index = fpcalc_out.find('FINGERPRINT=') + 12
+
+        # convert fingerprint to list of integers
+        fingerprints = map(int, fpcalc_out[fingerprint_index:].split(','))
+        
+        return fingerprints
 
     def correlation(self, listx, listy):
         """
@@ -111,6 +117,9 @@ class SignalAudio():
         return max_index
   
     def get_max_corr(self, corr, source, target):
+        """
+        Return the result of the match
+        """
         max_corr_index = self.max_index(corr)
         max_corr_offset = -self.__span + max_corr_index * self.__step
         print "max_corr_index = ", max_corr_index, "max_corr_offset = ", max_corr_offset
@@ -122,5 +131,5 @@ class SignalAudio():
             print "The covariance is under 0.5, it's seem that is not the same sound"
 
 
-s1 = Signal()
+s1 = SignalAudio()
 s1.correlate("whistle-3sec.wav","Dog-test.wav")

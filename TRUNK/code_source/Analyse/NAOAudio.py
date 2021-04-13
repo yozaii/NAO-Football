@@ -34,10 +34,16 @@ class NAOAudio:
             print "Error was: ",e
             sys.exit(1)
     
-    def startRecording(self):
-        self.__alDeviceAudioProxy.startMicrophonesRecording("C:\Users\Emman\Desktop\L3h1\TRUNK\code_source\Analyse\recordRobot.wav")
+    def startRecording(self, path = "C:\Users\Emman\Desktop\L3h1\TRUNK\code_source\Analyse\recordRobot.wav"):
+        """
+        Start the audio recording by the robot and save the recording in the given path
+        """
+        self.__alDeviceAudioProxy.startMicrophonesRecording(path)
 
     def stopRecording(self):
+        """
+        Stop the actual recording
+        """
         self.__alDeviceAudioProxy.stopMicrophonesRecording()
         
 
