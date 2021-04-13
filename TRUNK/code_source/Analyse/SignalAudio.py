@@ -4,11 +4,11 @@ import numpy
 class SignalAudio():
     def __init__(self):
         self.__sample_rate = 48000 
-        self.__fingerprint_source = [] # original whistle sound
-        self.__fingerprint_target = [] # sound receive by the robot
+        self.__fingerprint_source = [] # original whistle sound digitalized
+        self.__fingerprint_target = [] # sound receive by the robot digitalized
 
         
-        self.__span = 4 # number of points to scan cross correlation over (basically it's 150 but doesn't work)
+        self.__span = 4 # number of points to scan cross correlation over (basically it's 150 but doesn't work because < len(ofWhistleSound))
         
         self.__step = 1 # step size (in points) of cross correlation
 
@@ -80,7 +80,7 @@ class SignalAudio():
             listx = listx[:len(listy)]
         if min(len(listx), len(listy)) < self.__min_overlap:
             # Error checking in main program should prevent us from ever being able to get here.
-            return 
+            return None
         #raise Exception('Overlap too small: %i' % min(len(listx), len(listy)))
         return self.correlation(listx, listy)
 

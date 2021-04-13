@@ -1,18 +1,11 @@
-import numpy
 from naoqi import ALProxy
-from subprocess import check_output
-"""
-import matplotlib.pyplot as plt
-import librosa
-import librosa.display
-import unittest
-"""
 
 class NAOAudio:
     def __init__(self, IP = "127.0.0.1", PORT = 9559):
         self.__ip = IP #IP robot
         self.__port = PORT #PORT robot
         
+        self.__alDeviceAudioProxy = None #Connection to the module ALAudioDevice
         self.__soundDetectionProxy = None #Connection to the module ALSoundDetection
         self.__ALValue = None 
 
@@ -30,6 +23,24 @@ class NAOAudio:
             print "Error was: ",e
             sys.exit(1)
 
+    def connectToALDeviceAudio(self):
+        """
+        Connection to the module ALAudioDevice
+        """
+        try:
+            self.__alDeviceAudioProxy = ALProxy("ALAudioDevice", self.__ip, self.__port)
+        except Exception,e:
+            print "Could not create proxy to ALAudioDevice"
+            print "Error was: ",e
+            sys.exit(1)
+    
+    def startRecording(self):
+        self.__alDeviceAudioProxy.startMicrophonesRecording("C:\Users\Emman\Desktop\L3h1\TRUNK\code_source\Analyse\recordRobot.wav")
+
+    def stopRecording(self):
+        self.__alDeviceAudioProxy.stopMicrophonesRecording()
+        
+
     def subscribeToALSoundDetection(self, subscribeID = "default"):
         self.__soundDetectionProxy.subscribe(subscribeID)
 
@@ -45,44 +56,6 @@ class NAOAudio:
         """
         self.__soundDetectionProxy.SoundDetected(self.__eventName,self.__ALValue,  self.__subscriberIdentifier)
 
+robot = NAOAudio()
 
-class SignalAudio:
-    def __init__(self):
-        #path of the audio file format .wav
-        self.__whistle_file = None
-        self.__soundDetected = None
-        # spectrogram of recorded whistles
-        self.__whistleBegin = 2000
-        self.__whistleEnd = 4000
-        self.__sampleRate = 48000
-
-        #Audio file transform into sample frequency
-        self.__samplingFrequency = None
-        
-    def setAudioFile(self, path =""):
-        """
-        Set the path of the audio file
-        """
-        self.__whistle_file = path
-
-    def digitized(self):
-        """
-        The audio file is loaded into a NumPy array after being sampled at a particular sample rate (sr)
-        """
-        self.__samplingFrequency = librosa.load(self.__whistle_file, sr=self.__sampleRate)
-
-    def visualization(self, width = 6.4, height = 4.8):
-        """
-        Visualize the sampled signal and plot it (Matplotlib and Librosa librairies needed).
-        We depicts the waveform visualization of the amplitude vs the time representation of the signal.
-        """
-        plt.figure(figsize=(width, height))
-
-        #plotting the sampled signal
-        librosa.display.waveplot(self.__samplingFrequency, sr=self.__sampleRate) #Normally sr=sr in te exemple code
-
-    def normalization(self, axis):
-        """
-        A technique used to adjust the volume of audio files to a standard set level
-        """
-        return sklearn.preprocessing.minmax_scale(self.__samplingFrequency, axis=axis) #return the transformed __samplingFrequency 
+robot.connectToALDeviceAudio()
