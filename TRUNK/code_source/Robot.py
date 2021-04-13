@@ -109,6 +109,7 @@ class Robot(threading.Thread):
 
         elif gamePhase == Phase.Ready:
             print "robot ready"
+            # wait sonor signal
             while True:
                 break
             self.IA(Phase.Playing)
