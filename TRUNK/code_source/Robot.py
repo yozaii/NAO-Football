@@ -2,29 +2,31 @@
 #     Classes Robot      #
 #------------------------#
 import sys
-from threading import Thread
+import threading
 from naoqi import ALProxy
 import Action as action
 #from serveur.clientside import Client
 from Analyse.Analyse import *
 from Node import *
+import time
 
 xml = 'C:\\Users\\Youssef\\Downloads\\ball_cascade.xml'
 
-class Robot(Thread):
+class Robot(threading.Thread):
     """ 
     class define every robot
     """
     PORT = 9559
 
     def __init__(self,ip,role,strat,coach):
-        Thread.__init__(self)
+        threading.Thread.__init__(self)
+        self._stopevent = threading.Event( )
         self.coach = coach
         self.pos = None
         self.ip = ip
         self.role = role
-        #self.state = Phase.Initial
-        
+        self.ready = False
+
         # connection to the differentes modules
         self.tpMotion = self.connectProxy("ALMotion")
         self.tpPosture = self.connectProxy("ALRobotPosture")
@@ -37,41 +39,18 @@ class Robot(Thread):
             self.postureProxy = self.tpPosture[1]
             self.ledProxy = self.tpLed[1]
             self.analyse = Analyse(self.ip,PORT)
-            
 
     def stop(self):
         self.running = False
+        self._stopevent.set()
+        
 
     def run(self):
-        """wait 10 sec"""
-        while self.running:
+        while self.running and not self._stopevent.isSet():
             self.IA(Phase.Initial)
-            self.stop()
-
-    def connectionServer(self):
-        """
-        The client robot access to the server (have to be tested)
-        """
-        pass
-        #self.client.connection()
-
-    def send_postition_to_team(self):
-        """
-        The client robot send his position to
-        the rest of the team (have to be tested)
-        """
-        pass
-        #self.client.send_message(self.get_pos())
-
-    def receive_position_of_team(self):
-        """
-        Receive the position of his teammate (have to be tested)
-        (have to find a way to recup the position of each others robots)
-        """
-        pass
-        #while self.client.is_connected:
-         #   thread_listening = threading.Thread(target=self.listening)
-          #  thread_listening.start()
+            self.IA(Phase.Ready)
+            self._stopevent.wait(2.0)
+            
 
     def connectProxy(self,module):
         """
@@ -97,43 +76,59 @@ class Robot(Thread):
         """
         if gamePhase == Phase.Initial:
             # BLUE COLOR
-            names = ["ChestBoard/Led/Blue/Actuator/Value"]
-            self.ledProxy.createGroup("MyGroup",names)
-            self.ledProxy.on("MyGroup")
+            print "robot initial"
+            #names = ["ChestBoard/Led/Blue/Actuator/Value"]
+            #self.ledProxy.createGroup("MyGroup",names)
+            #self.ledProxy.on("MyGroup")
             # declare his actual position as his origin/home (function)
             #action.posturePlay()
-            # try
-            self.kickOff = True
             self.IA(Phase.Set)
 
         elif gamePhase == Phase.Set:
             # YELLOW COLOR
-            if self.kickOff:
+            print "robot set"
+            if self.coach.kickoff:
                 if self.role == Role.LATTACKER:
                     pass
                     #action.moveTo(Role[2])
+                    #self.scanForBall()
                 else:
                     pass
                     #action.moveTo(Role[1])
             # turn to be in front of the enemy goal
             #action.turn(self.motionProxy,50)
+            while not self.ready:
+                continue
 
         elif gamePhase == Phase.Ready:
-            # GREEN COLOR
-            self.analyse.waitSignal()
-            
+            print "robot ready"
+            while True:
+                break
+            self.IA(Phase.Playing)
 
         elif gamePhase == Phase.Playing:
-            pass
+            # GREEN COLOR
+            print "robot playing"
+            if self.coach.kickoff:
+                if self.role == Role.LATTACKER:
+                    print "attaque"
+                    #action.shoot()
+
+                elif self.role == Role.GOAL:
+                    print "goal"
+                    #self.scanForBall()
+                    # if posBall.get_y()<0
 
         elif gamePhase == Phase.Penalized:
+            print "penalized"
             # RED COLOR
             time.sleep(40)
-            self.IA(Phase.Ready)
+            self.IA(Phase.Playing)
 
         elif gamePhase == Phase.Finished:
             self.stop()
 
+        self._stopevent.wait(2.0)
 
     def scanForBall(self):
         """
