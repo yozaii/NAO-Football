@@ -2,7 +2,6 @@
 #     Classes Coach      #
 #------------------------#
 # -*- coding: utf-8 -*-
-#pyuic5 -x interface.ui -o interface.pyw
 
 import math
 import random
@@ -17,36 +16,70 @@ class Coach:
     """
     def __init__(self):
 
-        self.__listeRole = ["GOAL","RDEFENSE","LDEFENSE","RATTACKER","LATTACKER","MIDDLE"]
-        self.__listIp = ["127.0.0.1","127.0.0.2","172.96.26.32","172.96.26.33","172.96.26.34","172.96.26.35","172.96.26.36"]
-        self.__strat = Strategy.DEFAULT
+        self.listeRole = ["GOAL","RDEFENSE","LDEFENSE","RATTACKER","LATTACKER","MIDDLE"]
+        self.listIp = ["127.0.0.1","127.0.0.2","172.96.26.32","172.96.26.33","172.96.26.34","172.96.26.35","172.96.26.36"]
+        self.strat = Strategy.DEFAULT
         self.listRobot = []
+        self.posBall = Point2D(0,0)
+        self.kickoff = None
 
     def createPlayer(self,ip,role):
         """
         create an instance of robot
         """
-        robot = ROBOT.Robot(ip,role,self.__strat,self)
+        if role == "GOAL":
+            robot = ROBOT.Robot(ip,Role.GOAL,self.strat,self)
+        elif role == "RDEFENSE":
+            robot = ROBOT.Robot(ip,Role.RDEFENSE,self.strat,self)
+        elif role == "LDEFENSE":
+            robot = ROBOT.Robot(ip,Role.LDEFENSE,self.strat,self)
+        elif role == "RATTACKER":
+            robot = ROBOT.Robot(ip,Role.RATTACKER,self.strat,self)
+        elif role == "LATTACKER":
+            robot = ROBOT.Robot(ip,Role.LATTACKER,self.strat,self)
+        elif role == "MIDDLE":
+            robot = ROBOT.Robot(ip,Role.MIDDLE,self.strat,self)
         self.listRobot.append(robot)
-
         robot.start()
         return robot.running
 
     def ready(self):
+        # remplis sa liste de distance
         for robot in self.listRobot:
-            robot.IA(Phase.Ready)
+            robot.ready = True
+
+    def recoverPosBall(self,distance,robot):
+        """
+        allows to recover the better posBall among list of pos
+        """
+        mini = math.inf
+        for robot in self.listRobot:
+            tpl = (robot,robot.distance)
+            listDistance.append(tpl)
+            if robot.distance >= 0:
+                mini = min(mini,robot.distance)
+
+        for tpl in listDistance:
+            if mini == tpl[1]:
+                self.posBall = tpl[0].posBall
 
     def stopThreads(self):
         for robot in self.listRobot:
             robot.stop()
 
-    def stopThread(self,robot):
-            robot.stop()
-
+    def stopThread(self,ip):
+        for robot in self.listRobot:
+            if ip == robot.ip:
+                robot.stop()
+                self.listRobot.remove(robot)
+                return True
+            else:
+                return False
+        
 
     def isPresent(self,f,g,posElement):
         """
-        allows to know if a point3D is between two others point3D
+        allows to know if a point2D is between two others point3D
         Argument:
         f -- Function which corresponds to one of the external lines between two robots
         g -- Function which corresponds to one of the external lines between two robots
@@ -72,8 +105,6 @@ class Coach:
         horizontalCase = posElement.get_x() == self.f.get_x(posElement.get_y()) and posElement.get_x() == self.g.get_x(posElement.get_y())
         verticalCase = posElement.get_y() == self.f.get_y(posElement.get_x()) and posElement.get_y() == self.g.get_y(posElement.get_x())
         
-        
-
         if horizontalCase and yCase:
             return True
         elif verticalCase and xCase:
@@ -128,11 +159,13 @@ class Coach:
         return self.__listeRole
 
     def get_strat(self):
-        return self.__strat
+        return self.strat
 
     def get_listIp(self):
-        return self.__listIp
+        return self.listIp
 
+    def set_kickoff(self,kickoff):
+        self.kickoff = kickoff
 
 #******************     TEST Coach/Node    *********************#
 
@@ -172,22 +205,6 @@ class test(unittest.TestCase):
         test the b on: ax +b
         """
         self.assertEqual(self.f.get_b(),1)
-
-
-
-def testDistribRole(oumar):
-    """
-    test if all role are distributed
-    """
-
-    print("test of dirstribRole() function")
-    for i in range(6):
-        oumar.distribRole()
-    if len(oumar.get_listRole()) == 0:
-        print "success"
-    else:
-        print "failure"
-
 
 if __name__ == '__main__':
     testDistribRole(Coach())

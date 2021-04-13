@@ -3,28 +3,16 @@
 #------------------------#
 from enum import Enum
 
-class Point3D:
+class Point2D:
     """
-    3d point
+    2d point
     Argument:
     x -- x coordonnee
     y -- y coordonnee
-    z -- z coordonnee
     """
-    def __init__(self,x,y,z):
+    def __init__(self,x,y):
         self.__x = x
         self.__y = y
-        self.__z = z
-
-    def distance(self,posE1,posE2):
-        """
-        allows to calculate the distance between two point3D
-        Argument:
-        posE1 -- Position (Point3D) of the element 1
-        posE2 -- Position (Point3D) of the element 2
-        """
-
-        return sqrt(pow(posE2.get_x() - posE1.get_x() ,2) + pow(posE2.get_y() - posE1.get_y() ,2))
 
     def get_x(self):
         return self.__x
@@ -32,31 +20,23 @@ class Point3D:
     def get_y(self):
         return self.__y
 
-    def get_z(self):
-        return self.__z
-
     def set_x(self, x):
         self.__x = x
 
     def set_y(self, y):
         self.__y = y
 
-    def set_y(self, z):
-        self.__z = z
-
-
 class Role(Enum):
     """
     player role
     """
     __order__ = "GOAL RDEFENSE LDEFENSE RATTACKER LATTACKER MIDDLE"
-    GOAL = (1,Point3D(0,-4,0))
-    RDEFENSE = (2,Point3D(2,-3.35,0))
-    LDEFENSE = (3,Point3D(-2,-3.35,0))
-    RATTACKER = (4,Point3D(0.3,-3.35,0))
-    LATTACKER = (5,Point3D(-0.3,-3.35,0),Point3D(-0.3,-1,0))
-    MIDDLE = (6,Point3D(0.3,-3.35,0))
-
+    GOAL = ("GOAL",Point2D(0,-4))
+    RDEFENSE = ("RDEFENSE",Point2D(2,-3.35))
+    LDEFENSE = ("LDEFENSE",Point2D(-2,-3.35))
+    RATTACKER = ("RATTACKER",Point2D(0.3,-3.35))
+    LATTACKER = ("LATTACKER",Point2D(-0.3,-3.35),Point2D(-0.3,-1))
+    MIDDLE = ("MIDDLE",Point2D(0.3,-3.35))
 
 class Element(Enum):
     """
@@ -170,6 +150,15 @@ class PerimeterSquare:
     def get_botRight(self):
         return self.__botRight
 
+def distance(posE1,posE2):
+        """
+        allows to calculate the distance between two point3D
+        Argument:
+        posE1 -- Position (Point2D) of the element 1
+        posE2 -- Position (Point2D) of the element 2
+        """
+
+        return sqrt(pow(posE2.get_x() - posE1.get_x() ,2) + pow(posE2.get_y() - posE1.get_y() ,2))
+
 if __name__ == "__main__":
-    goal = Role.GOAL
-    print goal[0], goal[1]
+    pass
