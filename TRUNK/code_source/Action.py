@@ -1,8 +1,9 @@
 #-*- coding: utf-8 -*-
 import time
 import math
+import motion
 from naoqi import ALProxy
-import almath as m
+import almath 
 IP = "127.0.0.1"
 #IP = "172.27.96.33"
 #IP = "169.254.199.241"
@@ -24,7 +25,7 @@ def stiffnessOn(module):
     pNames = "Body"
     pStiffnessLists = 1.0
     pTimeLists = 1.0
-    proxy.stiffnessInterpolation(pNames, pStiffnessLists, pTimeLists)
+    module.stiffnessInterpolation(pNames, pStiffnessLists, pTimeLists)
 
 def danse(postureProxy, motionProxy):
     """
@@ -181,6 +182,7 @@ def postureDeJeu(postureProxy, motionProxy):
     The posture that should have the robot.
     """
     motionProxy.moveInit()
+    postureProxy.goToPosture("StandInit", 2)
     stiffnesses  = 1
     isAbsolute  = False
     names = ["LElbowRoll","RElbowRoll","LShoulderRoll","RShoulderRoll"]
@@ -196,7 +198,7 @@ def turn(motionProxy, degree):
     """ 
     theta = (((math.pi)/2) * degree) / 90
     x = 0
-    y = 0
+    y = 2
     motionProxy.moveTo(x, y, theta)
 
 def standby(postureProxy):
@@ -219,6 +221,9 @@ def walk(motionProxy,x,y,theta ):
     theta(degree)
     """
     motionProxy.moveTo(x, y, theta)
+    motionProxy.moveInit()
+    postureProxy.goToPosture("StandInit", 0.5)
+
 
 def walkFaster(motionProxy, postureProxy):
     # Set NAO in Stiffness On
@@ -296,11 +301,53 @@ def testWalk(motionProxy, postureProxy):
     robotMoveCommand = m.pose2DInverse(robotPositionBeforeCommand)*robotPositionAfterCommand
     print "The Robot Move Command: ", robotMoveCommand
 
+def coup(motionProxy, postureProxy):
+    motionProxy.moveInit()
+    postureProxy.goToPosture("StandInit", 0.5)
+    #Set NAO in stiffness On
+    stiffnessOn(motionProxy)
+    postureProxy.goToPosture("StandInit", 0.5)
 
-
-
-
-
+def contournBall(motionProxy, postureProxy, degree):
+    postureProxy.goToPosture("StandInit", 2)
+    footStepsList = [] 
+    # 1) Step forward with your left foot
+    footStepsList.append([["LLeg"], [[0.0, 0.15, -0.2]]])
+    # 2) Sidestep to the left with your left foot
+    footStepsList.append([["RLeg"], [[0.00, 0.15, -0.2]]])
+    # 3) Move your right foot to your left foot
+    footStepsList.append([["LLeg"], [[0.00, 0.15, -0.2]]])
+    # 4) Sidestep to the left with your left foot
+    footStepsList.append([["RLeg"], [[0.00, 0.15, -0.2]]])
+    # 5) Step backward & left with your right foot
+    footStepsList.append([["LLeg"], [[0.0, 0.15, -0.2]]])
+    # 6)Step forward & right with your right foot
+    footStepsList.append([["RLeg"], [[0.00, 0.15, -0.2]]])
+    # 7) Move your left foot to your right foot
+    footStepsList.append([["LLeg"], [[0.00, 0.15, -0.2]]])                    
+    # 8) Sidestep to the right with your right foot
+    footStepsList.append([["RLeg"], [[0.00, 0.15, -0.2]]])
+    ###############################
+    # Send Foot step
+    ###############################
+    stepFrequency = 0.8
+    clearExisting = False
+    nbStep= 9# defined the number of cycle to make
+    for j in range( nbStep):
+        for i in range( len(footStepsList) ):
+            try:
+                motionProxy.setFootStepsWithSpeed(
+                    footStepsList[i][0],
+                    footStepsList[i][1],
+                    [stepFrequency],
+                    clearExisting)
+            except Exception, errorMsg:
+                print str(errorMsg)
+                print "This example is not allowed on this robot."
+                exit()
+    motionProxy.waitUntilMoveIsFinished()
+    # Go to rest position
+    motionProxy.rest()
 if __name__ == "__main__":
 
 
@@ -310,13 +357,15 @@ if __name__ == "__main__":
     #time.sleep(2)
     #danse(postureProxy, motionProxy)
     #get_up(postureProxy)
-    #turn(motionProxy, 180)
+    #turn(motionProxy, 0)
     #walk(motionProxy,0.2,0,0)
     #postureDeJeu(postureProxy, motionProxy)
+    #coup(motionProxy, postureProxy)
     #shoot(postureProxy,motionProxy)
     #leftSideShoot(postureProxy, motionProxy)
     #rightSideShoot(postureProxy, motionProxy)
     #simpleShoot(postureProxy, motionProxy) 
     #defense(postureProxy, motionProxy, 0.1)
     #walkFaster(motionProxy, postureProxy)
+    contournBall(motionProxy, postureProxy, 0)
 
