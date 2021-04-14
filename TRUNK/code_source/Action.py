@@ -82,24 +82,24 @@ def shoot(postureProxy, motionProxy):
     #The robot shoots in the ball.
     """
     # Send NAO to Pose Init
+    postureProxy.goToPosture("Stand", 5)
     postureProxy.goToPosture("StandInit", 5)
     stiffnesses  = 1
     isAbsolute  = False
     #here the robot puts its foot back
-    names = ["LHipRoll","RHipPitch"]
-    angleLists = [math.radians(5),math.radians(20.3)]
-    timeLists = [2.0,2.0]
+    names = ["RAnkleRoll","LAnkleRoll","LHipPitch","LAnklePitch","LKneePitch"]
+    angleLists = [math.radians(10),math.radians(10),math.radians(10),math.radians(5),math.radians(-10)]
+    timeLists = [0.3,0.5,0.7,0.8,0.9]
     motionProxy.setStiffnesses(names, stiffnesses)
     motionProxy.angleInterpolation(names, angleLists, timeLists, isAbsolute)
-    # the robot shoots
-    names = ["RKneePitch","RHipPitch","RAnklePitch"]
-    angleLists = [math.radians(15),math.radians(-30),math.radians(-6)]
-    timeLists = [0.8,0.6,1.0]
+    #here the robot puts its foot back
+    names = ["RHipPitch","RAnklePitch","RKneePitch"]
+    angleLists = [math.radians(-15),math.radians(35),math.radians(-30)]
+    timeLists = [1,1,1]
     motionProxy.setStiffnesses(names, stiffnesses)
     motionProxy.angleInterpolation(names, angleLists, timeLists, isAbsolute)
-
-    # Send NAO to Pose Init
-    postureProxy.goToPosture("StandInit", 2)
+ 
+    
 
 def simpleShoot(postureProxy, motionProxy):
     """
@@ -302,12 +302,32 @@ def testWalk(motionProxy, postureProxy):
     print "The Robot Move Command: ", robotMoveCommand
 
 def coup(motionProxy, postureProxy):
-    motionProxy.moveInit()
-    postureProxy.goToPosture("StandInit", 0.5)
-    #Set NAO in stiffness On
-    stiffnessOn(motionProxy)
-    postureProxy.goToPosture("StandInit", 0.5)
 
+    #motionProxy.wakeUp()
+   # Send NAO to Pose Init
+    postureProxy.goToPosture("Stand", 5)
+    postureProxy.goToPosture("StandInit", 5)
+    stiffnesses  = 1
+    isAbsolute  = False
+    #here the robot puts its foot back
+    names = ["LHipRoll","RHipPitch","RAnklePitch"]
+    angleLists = [math.radians(15),math.radians(30),math.radians(-10)]
+    timeLists = [1.0,1.0,1.1]
+    motionProxy.setStiffnesses(names, stiffnesses)
+    motionProxy.angleInterpolation(names, angleLists, timeLists, isAbsolute)
+    # the robot shoots
+    names = ["RKneePitch","RHipPitch","RAnklePitch"]
+    angleLists = [math.radians(5),math.radians(-50),math.radians(10)]
+    timeLists = [0.8,0.6,1.0]
+    motionProxy.setStiffnesses(names, stiffnesses)
+    motionProxy.angleInterpolation(names, angleLists, timeLists, isAbsolute)
+    postureProxy.goToPosture("StandInit", 5)
+    names = ["RKneePitch","RHipPitch","RAnklePitch","LHipRoll"]
+    angleLists = [math.radians(-5),math.radians(15),math.radians(0),math.radians(-15)]
+    timeLists = [0.8,0.6,1.0,1]
+    motionProxy.setStiffnesses(names, stiffnesses)
+    motionProxy.angleInterpolation(names, angleLists, timeLists, isAbsolute)
+    
 def contournBall(motionProxy, postureProxy, degree):
     postureProxy.goToPosture("StandInit", 2)
     footStepsList = [] 
@@ -361,11 +381,11 @@ if __name__ == "__main__":
     #walk(motionProxy,0.2,0,0)
     #postureDeJeu(postureProxy, motionProxy)
     #coup(motionProxy, postureProxy)
-    #shoot(postureProxy,motionProxy)
+    shoot(postureProxy,motionProxy)
     #leftSideShoot(postureProxy, motionProxy)
     #rightSideShoot(postureProxy, motionProxy)
     #simpleShoot(postureProxy, motionProxy) 
     #defense(postureProxy, motionProxy, 0.1)
     #walkFaster(motionProxy, postureProxy)
-    contournBall(motionProxy, postureProxy, 0)
+    #contournBall(motionProxy, postureProxy, 0)
 
