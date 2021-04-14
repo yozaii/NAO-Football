@@ -2,7 +2,7 @@ from subprocess import check_output
 import numpy
 import sys 
 
-class SignalAudio():
+class SignalAudio:
     def __init__(self):
         self.__sample_rate = 48000 
         self.__fingerprint_source = [] # original whistle sound digitalized
@@ -31,8 +31,9 @@ class SignalAudio():
         self.__fingerprint_target = self.calculate_fingerprints(target)
 
         corr = self.compare(self.__fingerprint_source, self.__fingerprint_target)
-        print corr
         max_corr_offset = self.get_max_corr(corr, source, target)
+
+        return max_corr_offset
     
     def calculate_fingerprints(self, filename):
         """
@@ -127,8 +128,10 @@ class SignalAudio():
         if corr[max_corr_index] > self.__threshold:
             print('%s and %s match with correlation of %.4f at offset %i'
                 % (source, target, corr[max_corr_index], max_corr_offset)) 
+            return True
         else:
-            print "The covariance is under 0.5, it's seem that is not the same sound"
+            print "The covariance is under 0.5, it seem that is not the same sound"
+            return False
 
 
 s1 = SignalAudio()
