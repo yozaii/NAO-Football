@@ -133,6 +133,7 @@ class SignalAudio:
             print "The covariance is under 0.5, it seem that is not the same sound"
             return False
 
-
+"""
 s1 = SignalAudio()
 s1.correlate("whistle-3sec.wav","Dog-test.wav")
+"""
