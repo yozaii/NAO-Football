@@ -142,67 +142,83 @@ class Robot(threading.Thread):
         the ball. Once the ball is found, it moves its
         body to face the ball
         """
-        self.analyse._takeTopImage(xml)
-        self.analyse._takeBottomImage(xml)
+        self._analyse._takeTopImage(xml)
+        self._analyse._takeBottomImage(xml)
+        self._motionProxy.angleInterpolation("HeadPitch", [0.1], [1.0], True)
+        self._motionProxy.setStiffnesses("HeadPitch", 1)
+        t1 = time.time()
+        t2 = time.time() - t1
         #While ball is not found
-        while (self.analyse._ballAreaTop == -1 and self.analyse._ballAreaBottom == -1):
-            Action.lookAround(self.motionProxy)
-            self.analyse._takeTopImage(xml)
-            self.analyse._takeBottomImage(xml)
+        while (self._analyse._ballAreaTop == -1 and self._analyse._ballAreaBottom == -1 and t2 <12):
+            self._analyse._takeTopImage(xml)
+            self._analyse._takeBottomImage(xml)
+            Action.lookAround(self._motionProxy)
+            t2 = time.time() - t1
 
         #The robot and head face the ball
-        Action.turnBodyToHeadAngle(self.motionProxy)
+        Action.turnBodyToHeadAngle(self._motionProxy)
 
-    def moveToBall(self):
+
+        def moveToBall(self):
         """
         The robot moves towards the ball
         :return: exit state. If ball is lost (0) or if ball is at robots feet(1)
         """
-        x = 0.5
+        x = 0.6
         y = 0.0
         z = 0.0
-        self.analyse._takeTopImage(xml)
 
+        #Fix head angle
+        self._motionProxy.angleInterpolation("HeadYaw",[0.0], [1.0],True)
+        self._motionProxy.angleInterpolation("HeadPitch", [0.1], [1.0], True)
+        self._motionProxy.setStiffnesses("HeadPitch", 0)
+
+        self._analyse._takeTopImage(xml)
+        self._analyse._takeBottomImage(xml)
         #While the ball is visible in the camera and it is not near the feet
-        while ((self.analyse._ballAreaBottom != -1 or self.analyse._ballAreaTop != 1) and
-               self.analyse._ballGridLocationBottom[1] != [3,1] and
-               self.analyse._ballGridLocationBottom[1] != [3,2]
+        while ((self._analyse._ballAreaBottom != -1 or self._analyse._ballAreaTop != -1) and
+               (self._analyse._ballGridLocationBottom[0] != [3] and
+               self._analyse._ballGridLocationBottom[1] != [1])
+
         ):
+            self._motionProxy.post.move(x, y, z)
             #An image is taken
-            self.analyse._takeBottomImage(xml)
+            self._analyse._takeBottomImage(xml)
+            self._analyse._takeTopImage(xml)
 
             #If the ball is perceived towards the right
-            if (self.analyse._ballGridLocationBottom[1] == 3 or
-                self.analyse._ballGridLocationTop[1] == 3
+            if (self._analyse._ballGridLocationBottom[1] == 3 or
+                self._analyse._ballGridLocationTop[1] == 3
             ):
                 #The robot looks and moves towards the ball
-                x = x - 0.2
-                z = z + 0.2
-                self._motionProxy.post.move(x,y,z)
+                x = 0
+                z = 0.2
+
 
             #if the ball is perceived towards the left
-            elif (self.analyse._ballGridLocationBottom[1] == 0 or
-                  self.analyse._ballGridLocationTop[1] == 3
+            elif (self._analyse._ballGridLocationBottom[1] == 0 or
+                  self._analyse._ballGridLocationTop[1] == 0
             ):
-                # The robot looks and moves towards the ball
-                x = x - 0.2
-                z = z - 0.2
-                self.motionProxy.post.move(x,y,z)
+                # The robot looks and moves towards the
+                x = 0
+                z = -0.2
+
 
             #If the ball is perceived around the center
             else:
-                x = x + 0.2
+                if (x<1):
+                    x = x + 0.2
                 z = 0.0
-                self.motionProxy.post.move(x,y,z)
 
-        self.motionProxy.stopMove()
+        self._motionProxy.stopMove()
+        self._motionProxy.move(0.0,0.0,0.0)
 
         #If ball is lost return 0
-        if (self.analyse._ballAreaBottom != -1):
+        if (self._analyse._ballAreaBottom != -1):
             return 0
         #If ball is at feet return 1
-        elif (self.analyse._ballGridLocationBottom == [3,1] or
-               self.analyse._ballGridLocationBottom ==[3,2]
+        elif (self._analyse._ballGridLocationBottom == [3,1] or
+               self._analyse._ballGridLocationBottom ==[3,2]
         ):
             return 1
 

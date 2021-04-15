@@ -6,6 +6,7 @@ import numpy as np
 from naoqi import ALProxy
 import vision_definitions
 import unittest
+import cv2
 
 IP = '172.27.96.32'
 PORT = 9559
@@ -157,7 +158,7 @@ class TestNAOVision(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    #unittest.main()
 
 
     #Other tests below:
@@ -175,3 +176,8 @@ if __name__ == "__main__":
     print(nVis._imgClientTop + 'Test')
     nVis._unsubscribeToVideoProxy(0)
     """
+
+    nVis = NAOVision(IP, PORT)
+    nVis._subscribeToVideoProxy(1)
+    img = nVis._takeImage(1)
+    cv2.imshow('img', img)

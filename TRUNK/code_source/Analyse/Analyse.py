@@ -25,6 +25,10 @@ class Analyse :
         self._ballAreaTop = -1
         self._ballAreaBottom= -1
 
+        #Ball height
+        self._ballHeightTop = -1
+        self._ballHeightBottom = -1
+
         #Goal position attributes
         self._goalLeftPostBase = [-1,-1]
         self._goalRightPostBase = [-1, -1]
@@ -36,6 +40,9 @@ class Analyse :
         self._goalRightBaseGrid = [-1,-1]
         self._goalTopCenterGrid = [-1, -1]
         self._goalCenterGrid = [-1,-1]
+
+        #Distance from robot to ball in meters
+        self._distanceToBall = -1
 
         self._vision = NVis(IP, PORT)
         self._imPr = ImPr()
@@ -63,16 +70,21 @@ class Analyse :
                 self._ballCoordinatesTop[0]= -1
                 self._ballCoordinatesTop[0]= -1
                 self._ballAreaTop = -1
-                self._ballGridLocationTop = -1
+                self._ballHeightTop = -1
+                self._ballGridLocationTop = [-1, -1]
+                self._distanceToBall = -1
 
             #If ball is detected
             else :
+                #ballInfo[3] corresponds to height of ball
                 #ballInfo[4] corresponds to x of center of ball
                 #ballinfo[5] corresponds to y of center of ball
                 #ballInfo[6] corresponds to the area of the ball
                 self._ballCoordinatesTop[0] = ballInfo[4]
                 self._ballCoordinatesTop[1] = ballInfo[5]
                 self._ballAreaTop = ballInfo[6]
+                self._ballHeightTop = ballInfo[3]
+                self._updateDistanceToBall()
                 self._updateBallGridLocation(self._ballCoordinatesTop[0], self._ballCoordinatesTop[1], 0)
 
         elif (CameraID == 1):
@@ -80,9 +92,11 @@ class Analyse :
             #If no ball is detected
             if (ballInfo[0] == -1):
                 self._ballCoordinatesBottom[0]= -1
-                self._ballCoordinatesBottom[0]= -1
+                self._ballCoordinatesBottom[1]= -1
                 self._ballAreaBottom = -1
-                self._ballGridLocationBottom = -1
+                self._ballHeightBottom = -1
+                self._ballGridLocationBottom = [-1, -1]
+                self._distanceToBall = -1
 
             #If ball is detected
             else :
@@ -92,9 +106,9 @@ class Analyse :
                 self._ballCoordinatesBottom[0] = ballInfo[4]
                 self._ballCoordinatesBottom[1] = ballInfo[5]
                 self._ballAreaBottom = ballInfo[6]
+                self._ballHeightBottom = ballInfo[3]
+                self._updateDistanceToBall()
                 self._updateBallGridLocation(self._ballCoordinatesTop[0], self._ballCoordinatesTop[1], 1)
-
-
 
     def _updateBallGridLocation(self, x, y, cameraID):
         """
@@ -117,13 +131,55 @@ class Analyse :
                 self._ballGridLocationBottom = [xx, yy]
             return [xx, yy]
 
+    def _updateDistanceToBall(self):
+        """Updates the distance to ball according to where
+        it is perceived on the camera
+        """
+        #If ball is not seen
+        if self._ballHeightTop == -1 and self._ballHeightBottom -1:
+            self._distanceToBall = -1
+
+        #If ball is seen
+        else:
+            #Ball is een aroudn the top of the TopImage
+            if self._ballGridLocationTop[1] == 0:
+                #ratio allows us to find a more precise approximation
+                #of the distance to the ball
+                #ratio = self._ballHeightTop
+                self._distanceToBall = 4
+
+            elif self._ballGridLocationTop[1] == 1:
+                self._distanceToBall = 3
+
+            elif self._ballGridLocationTop[1] == 2:
+                self._distanceToBall = 2
+
+            elif self._ballGridLocationTop[1] == 3:
+                self._distanceToBall = 1
+
+            #Ball is seen around the top of TopImage
+            elif self._ballGridLocationBottom[1] == 0:
+
+                self._distanceToBall = 1
+
+            elif self._ballGridLocationBottom[1] == 1:
+                self._distanceToBall = 0.75
+
+            elif self._ballGridLocationBottom[1] == 2:
+                self._distanceToBall = 0.5
+
+            elif self._ballGridLocationBottom[1] == 3:
+                self._distanceToBall = 0.25
+
+
+
     def _updateGoalInfo(self, img):
         """
         Updates goal related attributes when taking an image
         :param img:
         :return:
         """
-        goalInfo = self._imPr.findGoalRectangle()
+        goalInfo = self._imPr.findGoalRectangle(img)
 
         self._goalLeftPostBase = [goalInfo[0],goalInfo[3]]
         self._goalRightPostBase = [goalInfo[1],goalInfo[3]]
@@ -162,7 +218,7 @@ class Analyse :
         """
         img = self._vision._takeImage(0)
         self._updateBallInfo(img, xml, 0)
-        self._updateGoalInfo(img)
+        #self._updateGoalInfo(img)
         return img
 
     def _takeBottomImage(self, xml):
@@ -198,7 +254,7 @@ class TestAnalyse(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    #unittest.main()
 
     #Other tests below:
     """Testing updateBallCoordinates
@@ -212,19 +268,23 @@ if __name__ == "__main__":
 
 
     #Testing imageCapture on top camera
-    time.sleep(2)
+    time.sleep(3)
     xml = 'C:\\Users\\Youssef\\Downloads\\ball_cascade.xml'
-    analyse = Analyse('127.0.0.1', 9559)
+    analyse = Analyse(IP, 9559)
+
     print(analyse._vision._videoProxy.getSubscribers())
     #analyse._vision._unsubscribeAll()
+
     naoimg = analyse._takeTopImage(xml)
     #naoimg2 = analyse._takeBottomImage(xml)
-    print(analyse._ballCoordinatesTop)
     cv2.imshow('naoimg',naoimg)
-    #cv2.imshow('naoimgbot',naoimg2)
+
+
+    print("distance to ball", analyse._distanceToBall)
+    print("ball coordinates top", analyse._ballCoordinatesTop)
+
     analyse._vision._unsubscribeAll()
     print(analyse._vision._videoProxy.getSubscribers())
-    print(analyse._ballCoordinatesTop)
+
     cv2.waitKey()
     cv2.destroyAllWindows()
-    #cv2.imshow('NAOImage',naoimg)

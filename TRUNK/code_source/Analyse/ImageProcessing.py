@@ -9,6 +9,10 @@ img3 = cv2.imread('C:\\Users\\Youssef\\Desktop\\Robocup Images\\Goal3.jpg')
 img4 = cv2.imread('C:\\Users\\Youssef\\Desktop\\Robocup Images\\Goal4.jpg')
 img5 = cv2.imread('C:\\Users\\Youssef\\Desktop\\Robocup Images\\Goal5.jpg')
 img6 = cv2.imread('C:\\Users\\Youssef\\Desktop\\Robocup Images\\Goal6.jpg')
+ball2 = cv2.imread('C:\\Users\\Youssef\\Desktop\\Robocup Images\\Ball2.jpg')
+ball3 = cv2.imread('C:\\Users\\Youssef\\Desktop\\Robocup Images\\Ball3.jpg')
+ball4 = cv2.imread('C:\\Users\\Youssef\\Desktop\\Robocup Images\\football2.jfif')
+
 
 
 
@@ -33,7 +37,7 @@ class ImageProcessing :
 
         """
         #showing source image
-        cv2.imshow('source',img)
+        #cv2.imshow('source',img)
 
         #the classifier from xml file
         ball_cascade = cv2.CascadeClassifier(xmlfile)
@@ -51,6 +55,7 @@ class ImageProcessing :
             roi_color = img[y:y + h, x:x + w]
 
         #showing result image
+        #cv2.imshow('res',img)
 
         #returns coordinates in result image
         infoList = [None] * 7
@@ -392,7 +397,7 @@ class TestImageProcessing(unittest.TestCase):
         self.assertEqual(1,1)
 
 if __name__ == "__main__":
-    unittest.main()
+    #unittest.main()
 
     #Other tests below:
     """
@@ -428,19 +433,23 @@ if __name__ == "__main__":
     img4 = cv2.resize(img4, (320,240))
     img5 = cv2.resize(img5, (320,240))
     img6 = cv2.resize(img6, (320,240))
+    ball2 = cv2.resize(ball2, (560,560))
+    ball3 = cv2.resize(ball3, (560,560))
+    #ball4 = cv2.resize(ball4, (560,560))
+
+
 
     imPr = ImageProcessing()
+    """
     two = imPr.findGoalRectangle(img2)
     three = imPr.findGoalRectangle(img3)
     four = imPr.findGoalRectangle(img4)
     five = imPr.findGoalRectangle(img5)
     six = imPr.findGoalRectangle(img6)
+    """
+    imPr.findBallRectangle(ball4, xml)
 
-    print("two: ", two)
-    print("three :", three)
-    print("four :", four)
-    print("five :", five)
-    print("six :", six)
+    cv2.waitKey()
 
 
 
