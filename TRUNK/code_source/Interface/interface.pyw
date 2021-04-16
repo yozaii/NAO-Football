@@ -1,12 +1,5 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'interface.ui'
-#
-# Created: Sun Apr  4 20:03:04 2021
-#      by: PyQt4 UI code generator 4.10
-#
-# WARNING! All changes made in this file will be lost!
-
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtCore import SIGNAL
 import sys
@@ -42,21 +35,74 @@ class Ui_MainWindow:
 
     def setupUi(self):
         self.MainWindow.setObjectName(_fromUtf8("MainWindow"))
-        self.MainWindow.resize(664, 600)
+        self.MainWindow.resize(660, 600)
 
         self.font = QtGui.QFont()
         self.font.setPointSize(12)
 
+
+
+        # principal window
         self.centralwidget = QtGui.QWidget(self.MainWindow)
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
 
+        # principal vbox
         self.verticalLayoutWidget = QtGui.QWidget(self.centralwidget)
-        self.verticalLayoutWidget.setGeometry(QtCore.QRect(40, 90, 591, 441))
+        self.verticalLayoutWidget.setGeometry(QtCore.QRect(40, 55, 591, 480))
         self.verticalLayoutWidget.setObjectName(_fromUtf8("verticalLayoutWidget"))
-
         self.vbox = QtGui.QVBoxLayout(self.verticalLayoutWidget)
         self.vbox.setMargin(0)
         self.vbox.setObjectName(_fromUtf8("vbox"))
+
+        # first hbox with kickoff button and timer
+        self.hbox1 = QtGui.QHBoxLayout()
+        self.hbox1.setMargin(0)
+        self.hbox1.setObjectName(_fromUtf8("hbox1"))
+
+        self.kickOffButton = QtGui.QRadioButton(self.verticalLayoutWidget)
+        self.kickOffButton.setEnabled(True)
+        self.kickOffButton.setFont(self.font)
+        self.kickOffButton.setObjectName(_fromUtf8("kickOffButton"))
+        self.hbox1.addWidget(self.kickOffButton)
+
+        spacerItem1 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.hbox1.addItem(spacerItem1)
+
+        self.vbox1 = QtGui.QVBoxLayout()
+        self.vbox1.setObjectName(_fromUtf8("vbox1"))
+
+        self.time = QtGui.QLabel(self.verticalLayoutWidget)
+        self.time.setFont(self.font)
+        self.time.setObjectName(_fromUtf8("time"))
+        self.vbox1.addWidget(self.time)
+
+        self.hbox2 = QtGui.QHBoxLayout()
+        self.hbox2.setMargin(0)
+        self.hbox2.setObjectName(_fromUtf8("hbox2"))
+
+        self.startButton = QtGui.QPushButton(self.verticalLayoutWidget)
+        self.startButton.setFont(self.font)
+        self.startButton.setObjectName(_fromUtf8("startButton"))
+
+        self.stopButton = QtGui.QPushButton(self.verticalLayoutWidget)
+        self.stopButton.setFont(self.font)
+        self.stopButton.setObjectName(_fromUtf8("stopButton"))
+
+        self.resetButton = QtGui.QPushButton(self.verticalLayoutWidget)
+        self.resetButton.setFont(self.font)
+        self.resetButton.setObjectName(_fromUtf8("resetButton"))
+
+        self.hbox2.addWidget(self.startButton)
+        self.hbox2.addWidget(self.stopButton)
+        self.hbox2.addWidget(self.resetButton)
+
+        self.vbox1.addLayout(self.hbox2)
+
+        self.hbox1.addLayout(self.vbox1)
+
+        self.vbox.addLayout(self.hbox1)
+
+        # list of robot
 
         self.listWidget = QtGui.QListWidget(self.verticalLayoutWidget)
         self.listWidget.setObjectName(_fromUtf8("listWidget"))
@@ -69,6 +115,9 @@ class Ui_MainWindow:
         self.listWidget.setItemWidget(self.item,self.reference)
 
         self.vbox.addWidget(self.listWidget)
+
+
+        # button add ready disconnect
 
         self.hbox = QtGui.QHBoxLayout()
         self.hbox.setObjectName(_fromUtf8("hbox"))
@@ -96,6 +145,8 @@ class Ui_MainWindow:
 
         self.vbox.addLayout(self.hbox)
 
+        # exit button
+
         self.exit = QtGui.QPushButton(self.centralwidget)
         self.exit.setGeometry(QtCore.QRect(550, 560, 75, 23))
         self.exit.setFont(self.font)
@@ -113,12 +164,30 @@ class Ui_MainWindow:
         self.readyButton.setText(_translate("MainWindow", "Ready", None))
         self.disconnectButton.setText(_translate("MainWindow", "Disconnect", None))
         self.exit.setText(_translate("MainWindow", "Exit", None))
+        self.kickOffButton.setText(_translate("MainWindow", "Kickoff", None))
+        self.time.setText(_translate("MainWindow", "Time: "+ str(self.coach.timer.minute) +":"+str(self.coach.timer.sec), None))
+        self.startButton.setText(_translate("MainWindow", "Start", None))
+        self.stopButton.setText(_translate("MainWindow", "Stop", None))
+        self.resetButton.setText(_translate("MainWindow", "Reset", None))
 
     def eventUI(self):
         self.exit.clicked.connect(self.close)
         self.addButton.clicked.connect(self.add)
         self.readyButton.clicked.connect(self.takeReady)
         self.disconnectButton.clicked.connect(self.disconnect)
+        self.startButton.clicked.connect(self.start)
+        self.stopButton.clicked.connect(self.stop)
+        self.resetButton.clicked.connect(self.reset)
+        self.kickOffButton.clicked.connect(self.kickoffIsOn)
+
+    def start(self):
+        self.coach.startTimer()
+
+    def stop(self):
+        self.coach.timer.stop()
+
+    def reset(self):
+        self.coach.timer.reset()
 
     def close(self):
         self.coach.stopThreads()
@@ -167,6 +236,12 @@ class Ui_MainWindow:
             self.listRoleChoose.remove(selectedRole)
             self.listRole.append(selectedRole)
 
+    def kickoffIsOn(self):
+        if self.kickOffButton.isChecked():
+            
+            self.coach.kickoff = True
+        else:
+            self.coach.kickoff = False
 
     def takeReady(self):
         self.coach.ready()

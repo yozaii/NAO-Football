@@ -84,9 +84,8 @@ class Robot(threading.Thread):
         if gamePhase == Phase.Initial:
             # BLUE COLOR
             print "robot initial"
-            #names = ["ChestBoard/Led/Blue/Actuator/Value"]
-            #self.ledProxy.createGroup("MyGroup",names)
-            #self.ledProxy.on("MyGroup")
+            self.ledProxy.fadeListRGB('ChestLeds', [0x000000ff], [0])
+            time.sleep(5)
             # declare his actual position as his origin/home (function)
             #action.posturePlay()
             self.IA(Phase.Set)
@@ -94,6 +93,8 @@ class Robot(threading.Thread):
         elif gamePhase == Phase.Set:
             # YELLOW COLOR
             print "robot set"
+            self.ledProxy.fadeListRGB('ChestLeds', [0x00f5bb19], [0])
+            time.sleep(5)
             if self.coach.kickoff:
                 if self.role == Role.LATTACKER:
                     pass
@@ -109,7 +110,10 @@ class Robot(threading.Thread):
 
         elif gamePhase == Phase.Ready:
             print "robot ready"
+            time.sleep(5)
+            action.danse(self.postureProxy,self.motionProxy)
             # wait sonor signal
+            # coach.playing
             while True:
                 break
             self.IA(Phase.Playing)
@@ -117,6 +121,8 @@ class Robot(threading.Thread):
         elif gamePhase == Phase.Playing:
             # GREEN COLOR
             print "robot playing"
+            self.ledProxy.fadeListRGB('ChestLeds', [0x0000ff00], [0])
+            time.sleep(5)
             if self.coach.kickoff:
                 if self.role == Role.LATTACKER:
                     print "attaque"
@@ -130,10 +136,12 @@ class Robot(threading.Thread):
         elif gamePhase == Phase.Penalized:
             print "penalized"
             # RED COLOR
+            self.ledProxy.fadeListRGB('ChestLeds', [0x00FF0000], [0])
             time.sleep(40)
             self.IA(Phase.Playing)
 
         elif gamePhase == Phase.Finished:
+            self.ledProxy.fadeListRGB('ChestLeds', [0x0000000], [0])
             self.stop()
 
     def scanForBall(self):
