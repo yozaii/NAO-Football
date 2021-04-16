@@ -19,7 +19,8 @@ class NAOAudio:
 
         self.__eventName = "SoundDetected"
         self.__subscriberIdentifier = ""
-    #----------------
+
+    #---------------- Connection to NAO's modules ----------------#
     def connectToALTextToSpeech(self):
         """
         Connection to the module ALTextToSpeech
@@ -63,7 +64,8 @@ class NAOAudio:
             print "Could not create proxy to ALSoundDetection"
             print "Error was: ",e
             raise Exception
-    #----------------
+
+    #---------------- Recording methods (ALDeviceAudio) ----------------#
     def startRecording(self, path = "/home/nao/recordRobot.wav"):
         """
         Start the audio recording by the robot and save the recording in the given path
@@ -75,7 +77,8 @@ class NAOAudio:
         Stop the actual recording
         """
         self.__alDeviceAudioProxy.stopMicrophonesRecording()
-    #----------------
+
+    #---------------- Speaker methods (ALTextToSpeech) ----------------#
     def setSpeakerVolume(self, vol = 1):
         """
         Set the volume of NOA's voice (between 0 (0%) and 1 (100%))
@@ -87,7 +90,8 @@ class NAOAudio:
         Make speak the NAO
         """
         self.__alTTS.say(sentence)
-    #----------------
+
+    #---------------- Audio methods (ALSoundDetection) ----------------#
     def setSensitivity(self, sensitivity = 0.5):
         """
         Set the sensitivity of sound (between 0 and 1)
@@ -99,14 +103,15 @@ class NAOAudio:
         Raised when a significant sound has been detected.
         """
         self.__alSoundDetectionProxy.SoundDetected(self.__eventName,self.__ALValue,  self.__subscriberIdentifier)
-    #----------------
+
+    #---------------- NAO's files recuperation ----------------#
     def downloadNaoFile(self, path = "scp nao@172.27.96.33:/home/nao/recordRobot.wav ."):
         """
         Access to the NAO's file and download the specied file in the current desktop folder
         """
         cmd = path
         os.system(cmd)
-    #----------------
+    #---------------- Getter and Setter ----------------#
     def getIP(self):
         return self.__ip
 
@@ -128,7 +133,80 @@ class TestNAOAudio(unittest.TestCase):
         self.assertEqual(robotAudio.getIP(), "127.0.0.1")
         self.assertEqual(robotAudio.getPORT(), 9559)
 
+    #---------------- Tests with simulator or real robot ----------------#
+    def test_connectToALTextToSpeech_without_error(self):
+        """
+        The method return nothin
+        (Need simulator or real robot to pass the test)
+        """
+        robotAudio = NAOAudio()
 
+        self.assertIsNone(robotAudio.connectToALTextToSpeech)
+
+    def test_connectToALMemory_without_error(self):
+        """
+        The method return nothin
+        (Need simulator or real robot to pass the test)
+        """
+        robotAudio = NAOAudio()
+
+        self.assertIsNone(robotAudio.connectToALMemory)
+    
+    def test_connectToALDeviceAudio_without_error(self):
+        """
+        The method return nothin
+        (Need simulator or real robot to pass the test)
+        """
+        robotAudio = NAOAudio()
+
+        self.assertIsNone(robotAudio.connectToALDeviceAudio)
+
+    def test_connectToALSoundDetection_without_error(self):
+        """
+        The method return nothin
+        (Need simulator or real robot to pass the test)
+        """
+        robotAudio = NAOAudio()
+
+        self.assertIsNone(robotAudio.connectToALSoundDetection)
+    
+    def test_startRecording_with_illegals_arguments(self):
+        """
+        Raise an Exception when illegals arguments are passed
+        (Need simulator or real robot to pass the test)
+        """
+        robotAudio = NAOAudio()
+
+        self.assertRaises(Exception, robotAudio.startRecording, ("je veux une erreur", None))
+
+    def test_stopRecording_with_illegals_arguments(self):
+        """
+        Raise an Exception when illegals arguments are passed
+        (Need simulator or real robot to pass the test)
+        """
+        robotAudio = NAOAudio()
+
+        self.assertRaises(Exception, robotAudio.stopRecording, ("je veux une erreur", None))
+
+    def test_startRecording_with_illegals_arguments(self):
+        """
+        Raise an Exception when illegals arguments are passed
+        (Need simulator or real robot to pass the test)
+        """
+        robotAudio = NAOAudio()
+
+        self.assertRaises(Exception, robotAudio.startRecording, ("je veux une erreur", None))
+
+    def test_setSpeakerVolume_with_illegals_arguments(self):
+        """
+        Raise an Exception when illegals arguments are passed
+        (Need simulator or real robot to pass the test)
+        """
+        robotAudio = NAOAudio()
+
+        self.assertRaises(Exception, robotAudio.setSpeakerVolume, ("je veux une erreur", None))
+
+    #---------------- Tests without simulator or real robot ----------------#
     def test_connectToALTextToSpeech_without_simulation(self):
         """
         Raise Exception when they are no robot simulation
@@ -161,13 +239,7 @@ class TestNAOAudio(unittest.TestCase):
 
         self.assertRaises(Exception, robotAudio.connectToALSoundDetection)
 
-    def test_startRecording_with_illegals_arguments(self):
-        """
-        Raise an Exception when illegals arguments are passed
-        """
-        robotAudio = NAOAudio()
-
-        self.assertRaises(Exception, robotAudio.startRecording, ("je veux une erreur", None))
+    
 
 if __name__ == "__main__":
 
