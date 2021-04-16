@@ -1,12 +1,38 @@
-#------------------------#
-#     Classes Coach      #
-#------------------------#
 # -*- coding: utf-8 -*-
 
 import math
 import random
 from Node import *
 import Robot as ROBOT
+import threading
+import time
+
+class Timer(threading.Thread):
+    def __init__(self):
+        threading.Thread.__init__(self)
+        self.sec = 0
+        self.minute = 0
+        self.running = True
+
+    def run(self):
+        while self.running:
+            if self.sec < 60:
+                self.minute += 1
+                self.sec = 0
+                
+            else:
+                self.sec +=1
+            time.sleep(1)
+
+    def stop(self):
+        self.running = False
+
+    def reset(self):
+        self.minute = 0
+        self.sec = 0
+        self.stop()
+        self.running = True
+
 
 class Coach:
     """ 
@@ -17,11 +43,15 @@ class Coach:
     def __init__(self):
 
         self.listeRole = ["GOAL","RDEFENSE","LDEFENSE","RATTACKER","LATTACKER","MIDDLE"]
-        self.listIp = ["127.0.0.1","127.0.0.2","172.96.26.32","172.96.26.33","172.96.26.34","172.96.26.35","172.96.26.36"]
+        self.listIp = ["127.0.0.1","172.27.96.32","172.27.96.33","172.27.96.34","172.27.96.35","172.27.96.36"]
         self.strat = Strategy.DEFAULT
         self.listRobot = []
         self.posBall = Point2D(0,0)
         self.kickoff = None
+        self.timer = Timer()
+
+    def startTimer(self):
+        self.timer.start()
 
     def createPlayer(self,ip,role):
         """
@@ -76,7 +106,6 @@ class Coach:
             else:
                 return False
         
-
     def isPresent(self,f,g,posElement):
         """
         allows to know if a point2D is between two others point3D
