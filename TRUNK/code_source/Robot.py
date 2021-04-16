@@ -167,7 +167,7 @@ class Robot(threading.Thread):
         Action.turnBodyToHeadAngle(self._motionProxy)
 
 
-        def moveToBall(self):
+    def moveToBall(self):
         """
         The robot moves towards the ball
         :return: exit state. If ball is lost (0) or if ball is at robots feet(1)

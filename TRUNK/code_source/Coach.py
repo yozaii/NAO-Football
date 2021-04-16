@@ -6,6 +6,7 @@ from Node import *
 import Robot as ROBOT
 import threading
 import time
+from Interface.interface import Ui_MainWindow
 
 class Timer(threading.Thread):
     def __init__(self):
@@ -14,15 +15,19 @@ class Timer(threading.Thread):
         self.minute = 0
         self.running = True
 
+    def setup(self,ui):
+        self.ui = ui
+
     def run(self):
         while self.running:
-            if self.sec < 60:
+            if self.sec == 59:
                 self.minute += 1
                 self.sec = 0
                 
             else:
                 self.sec +=1
             time.sleep(1)
+            self.ui.time.setText("Time: "+ str(self.minute) +":"+str(self.sec))
 
     def stop(self):
         self.running = False
@@ -30,8 +35,6 @@ class Timer(threading.Thread):
     def reset(self):
         self.minute = 0
         self.sec = 0
-        self.stop()
-        self.running = True
 
 
 class Coach:
@@ -49,9 +52,6 @@ class Coach:
         self.posBall = Point2D(0,0)
         self.kickoff = None
         self.timer = Timer()
-
-    def startTimer(self):
-        self.timer.start()
 
     def createPlayer(self,ip,role):
         """
@@ -96,6 +96,7 @@ class Coach:
     def stopThreads(self):
         for robot in self.listRobot:
             robot.stop()
+        self.timer.stop()
 
     def stopThread(self,ip):
         for robot in self.listRobot:

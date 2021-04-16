@@ -3,3 +3,4 @@ import Coach as coach
 
 oumar = coach.Coach()
 window = interface.Ui_MainWindow(oumar.listeRole,oumar.listIp,oumar)
+oumar.timer.setup(window)

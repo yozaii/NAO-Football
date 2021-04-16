@@ -3,7 +3,7 @@ import time
 import math
 import motion
 from naoqi import ALProxy
-import almath 
+#import almath 
 IP = "127.0.0.1"
 #IP = "172.27.96.33"
 #IP = "169.254.199.241"

@@ -181,7 +181,8 @@ class Ui_MainWindow:
         self.kickOffButton.clicked.connect(self.kickoffIsOn)
 
     def start(self):
-        self.coach.startTimer()
+        self.coach.timer.setup(self)
+        self.coach.timer.start()
 
     def stop(self):
         self.coach.timer.stop()
