@@ -47,7 +47,7 @@ class TestAction(unittest.TestCase):
     
     def test_turn(self):
         self.assertEqual(self.module1,"ALMotion")
-        self.assertLess(self.degree, 360) 
+        self.assertLess(self.degree, 360) and self.asserGreater(self.degree, -360)
 
     def test_defense(self):
         self.assertEqual(self.module1,"ALMotion")
@@ -61,6 +61,16 @@ class TestAction(unittest.TestCase):
 
     def test_stiffnessOn(self):
         self.assertEqual(self.module1,"ALMotion") 
+    
+    def test_simpleShoot(self):
+        self.assertEqual(self.module1,"ALMotion") and self.assertEqual(self.module2,"ALRobotPosture")
+
+    def test_contournBall(self):
+        self.assertEqual(self.module1,"ALMotion") and self.assertEqual(self.module2,"ALRobotPosture")
+        self.assertLess(self.degree, 360) and self.asserGreater(self.degree, -360)
+
+    def test_shootFromChoregraphe(self):  
+        self.assertEqual(self.module1,"ALMotion")
 
 
 if __name__ == '__main__':
