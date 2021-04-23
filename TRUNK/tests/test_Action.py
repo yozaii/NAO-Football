@@ -1,13 +1,12 @@
 import unittest
-import Action
 
 class TestAction(unittest.TestCase):
    
     
     def setUp(self):
-        self.mProxy = Action.connect("ALMotion")
-        self.pProxy = Action.connect("ALRobotPosture")
-        self.nProxy = Action.connect("ALNavigation")
+        self.mProxy = connect("ALMotion")
+        self.pProxy = connect("ALRobotPosture")
+        self.nProxy = connect("ALNavigation")
         self.module1 = "ALMotion"
         self.module2 = "ALRobotPosture"
         self.module3 = "ALNavigation"
@@ -53,6 +52,9 @@ class TestAction(unittest.TestCase):
 
     def test_walkFaster(self):
         self.assertEqual(self.module1,"ALMotion") and self.assertEqual(self.module2,"ALRobotPosture")
+        self.assertLess(self.x, 9) 
+        self.assertLess(self.y, 9)
+        self.assertLess(self.degree, 360) and self.asserGreater(self.degree, -360)
 
     def test_stiffnessOn(self):
         self.assertEqual(self.module1,"ALMotion") 
