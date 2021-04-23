@@ -8,6 +8,10 @@ import qi
 from naoqi import ALProxy
 
 class Client:
+    """
+    Class Client who connects to the server
+    """
+    
     host = "192.168.56.1" #The IP server(ou DNS name)
     port = 10000
     DISCONNECTION_MESSAGE = "fin"
@@ -69,6 +73,9 @@ class Client:
 #-------------------------------------- Tests connection to the robot -------------------------------------------------
 
 def testConnectionToRobotWithQi_Application():
+    """
+    Test the connection to the robot 
+    """
     app = qi.Application(url="tcp://172.27.96.32:9559") #Connection to the robot with his IP and port
     app.start()
     session = app.session
@@ -81,6 +88,9 @@ def testConnectionToRobotWithQi_Application():
 
 
 def testConnectionToRobotWithSession():
+    """
+    Test the connection to the robot
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument("--ip", type=str, default="172.27.96.32",help="Robot IP address. On robot or Local Naoqi: use '127.0.0.1'.")
     parser.add_argument("--port", type=int, default=9559,help="Naoqi port number")
@@ -96,6 +106,9 @@ def testConnectionToRobotWithSession():
     print serviceClient.returnIP() #Normally return the robot adress IP
 
 def testConnectionToRobotWithALConnectionManager():
+    """
+    Test the connection to the robot
+    """
     networkProxy = ALProxy("ALConnectionManager", "172.27.96.32", 9559) #Connect the module ALConnectionManager with the robot
     networkProxy.connect()
 

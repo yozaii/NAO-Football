@@ -6,6 +6,10 @@ import os
 import unittest
 
 class NAOAudio:
+    """
+    Class NAO Audio who use NAO's audio modules
+    """
+    
     def __init__(self, IP = "127.0.0.1", PORT = 9559):
         self.__ip = IP #IP robot
         self.__port = PORT #PORT robot 

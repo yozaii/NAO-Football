@@ -4,6 +4,9 @@ import sys
 import unittest
 
 class SignalAudio:
+    """
+    Class Signal Audio who processes the recording retrieved by the Nao Robot
+    """
     def __init__(self):
         self.__sample_rate = 48000 # KHz of the .wav file from robot NAO
         self.__fingerprint_source = [] # original whistle sound digitalized

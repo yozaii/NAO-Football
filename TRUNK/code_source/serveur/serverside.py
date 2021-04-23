@@ -5,6 +5,10 @@ import threading
 import unittest
  
 class Server:
+    """
+    Class Server who dispatches the message of clients to others clients
+    """
+    
     host = socket.gethostbyname(socket.gethostname())
     port = 10000
     HEADER = 64
