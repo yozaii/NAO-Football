@@ -124,30 +124,25 @@ class AffineFunction:
         return self.__a*x + self.__b 
 
 class PerimeterSquare:
-    def __init__(self,pos,x):
+    def __init__(self,pos,x,tl,tr,bl,br):
         self.__pos = pos
-        self.__topLeft.set_y(pos.get_y()+x)
-        self.__topLeft.set_x(pos.get_x()-x)
-        self.__topRight.set_y(pos.get_y()+x)
-        self.__topRight.set_x(pos.get_x()+x)
-        self.__botLeft.set_y(pos.get_y()-x)
-        self.__botLeft.set_x(pos.get_x()-x)
-        self.__botRight.set_y(pos.get_y()-x)
-        self.__botRight.set_x(pos.get_x()+x)
-
-    def __init__(self,tl,tr,bl,br):
-        self.__topLeft = tl
-        self.__topRight = tr
-        self.__botLeft = bl
-        self.__botRight = br
+        if(x != None):
+            self.__topLeft = Point2D(pos.get_x()-x,pos.get_y()+x)
+            self.__topRight = Point2D(pos.get_x()+x,pos.get_y()+x)
+            self.__botLeft = Point2D(pos.get_x()-x,pos.get_y()-x)
+            self.__botRight = Point2D(pos.get_x()+x,pos.get_y()-x)
+        else:
+            self.__topLeft = tl
+            self.__topRight = tr
+            self.__botLeft = bl
+            self.__botRight = br
+        
 
     def perimeter(self,pos):
         """
         allows to know if the pos is on the perimeter
         """
-        if pos.get_x() > self.__topLeft.get_x() and pos.get_x() < self.__topRight.get_x() and
-           pos.get_y() < self.__topLeft.get_y() and pos.get_y() > self.__topRight.get_y() and
-           pos.get_y() > self.__botLeft.get_y() and pos.get_y() < self.__botRight.get_y():
+        if pos.get_x() > self.__topLeft.get_x() and pos.get_x() < self.__topRight.get_x() and pos.get_y() < self.__topLeft.get_y() and pos.get_y() > self.__topRight.get_y() and pos.get_y() > self.__botLeft.get_y() and pos.get_y() < self.__botRight.get_y():
             return True
         else: return False
 
