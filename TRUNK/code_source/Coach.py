@@ -53,6 +53,11 @@ class Coach:
         self.posBall = Point2D(0,0)
         self.kickoff = None
         self.timer = Timer()
+        self.posCageAdverse = Point2D(0,4.5)
+        self.posCageSelf = Point2D(0,-4.5)
+        self.perimeterShoot = PerimeterSquare(self.posCageAdverse,2)
+        self.perimeterGardian = PerimeterSquare(self.posCageAdverse,2)
+        self.perimeterGround = PerimeterSquare(Point2D(-3,4.5),Point2D(3,4.5),Point2D(-3,-4.5),Point2D(3,-4.5))
 
     def createPlayer(self,ip,role):
         """

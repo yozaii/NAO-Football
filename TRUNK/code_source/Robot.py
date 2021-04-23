@@ -85,16 +85,43 @@ class Robot(threading.Thread):
     def set_pos(self,pos):
         self.pos = pos
 
+    def play(condition,x,y):
+        """
+        playing routine
+        """
+        # on scan le terrain pour detecter la balle
+        if self.scanForBall():
+            # si le ballon est dans le perimetre de jeu selon le role et dans la zone de jeu
+            if condition and self.coach.perimeterGround.perimeter(self.coach.posBall):
+                # on se deplace jusqu'a être à coté
+                if self.moveToBall():
+                    # si on est dans le perimetre de tir et dans l'alignement des cages
+                    if self.coach.perimeterShoot.perimeter() and alignement():
+                        # on shoot
+                        action.shoot()
+                    # sinon si il y a un obstacle
+                    elif obstacle():
+                        # on essaye de faire une passe
+                        if self.coach.passBall():
+                            action.passTo(pos)
+                        # sinon on contourne
+                        else:
+                            action.contourne()
+                    # sinon on se place dans le perimetre et on s'aligne
+                    else:
+                        action.moveTo(self.coach.posCage)
+                        action.turn(self.motionProxy,degree)
+            else:
+                action.moveTo(Point2D(x,y))
+
     def IA(self,gamePhase):
         """
         decision per phase of robot
         """
-
         if gamePhase == Phase.Initial:
             # BLUE COLOR
             self.ledProxy.fadeListRGB('ChestLeds', [0x000000ff], [0])
             # declare his actual position as his origin/home (function)
-            #action.posturePlay()
             self.IA(Phase.Set)
 
         elif gamePhase == Phase.Set:
@@ -102,21 +129,17 @@ class Robot(threading.Thread):
             self.ledProxy.fadeListRGB('ChestLeds', [0x00f5bb19], [0])
             if self.coach.kickoff:
                 if self.role == Role.LATTACKER:
-                    pass
-                    #action.moveTo(Role[2])
-                    #self.scanForBall()
+                    action.moveTo(Role[2])
+                    self.scanForBall()
                 else:
-                    pass
-                    #action.moveTo(Role[1])
+                    action.moveTo(Role[1])
             # turn to be in front of the enemy goal
-            #action.turn(self.motionProxy,degresOfTurn)
+            action.turn(self.motionProxy,degresOfTurn)
             while not self.ready:
                 continue
 
         elif gamePhase == Phase.Ready:
-            #action.danse(self.postureProxy,self.motionProxy)
             # wait sonor signal
-            # coach.playing
             while True:
                 break
             self.IA(Phase.Playing)
@@ -124,18 +147,39 @@ class Robot(threading.Thread):
         elif gamePhase == Phase.Playing:
             # GREEN COLOR
             self.ledProxy.fadeListRGB('ChestLeds', [0x0000ff00], [0])
-            if self.coach.kickoff:
-                if self.role == Role.LATTACKER:
-                    print "attaque"
-                    #action.shoot()
+            # selon le role
+            if self.role == Role.LATTACKER:
+                # si on a l'engagement
+                if self.coach.kickoff:
+                    action.shoot()
+                while self.coach.timer.minute < 10:
+                    play((self.coach.posBall.get_y() > -0.75 and coach.posBall.get_x() < 0),-0.75,0)
+                    
+            elif self.role == Role.RATTACKER:
+                while self.coach.timer.minut:
+                    play((self.coach.posBall.get_y() > -0.75 and coach.posBall.get_x() > 0),0.75,0)
+                
+            elif self.role == Role.LDEFENSE:
+                while self.coach.timer.minut:
+                    play((self.coach.posBall.get_y() < -0.75 and coach.posBall.get_x() > 0),-0.75,-3)
+                
+            elif self.role == Role.RDEFENSE:
+                while self.coach.timer.minut:
+                    play((self.coach.posBall.get_y() < -0.75 and coach.posBall.get_x() > 0),0.75,-3)
 
-                elif self.role == Role.GOAL:
-                    print "goal"
-                    #self.scanForBall()
-                    # if posBall.get_y()<0
+            elif self.role == Role.GOAL:
+                while self.coach.timer.minut:
+                    # si la balle vient dans notre camps le robot se deplace en fonction d'elle
+                    if self.coach.posBall.get_y() > -2:
+			            if self.coach.posBall.get_x() < 0:
+				            action.moveTo(Point2D(-1,-4.2))
+			            elif self.coach.posBall.get_() > 0:
+				            action.moveTo(Point2D(1,-4.2))
+                    # si elle rentre dans le perimetre du gardien il s'assoit pour proteger les cages
+                    if self.coach.perimeterGardian.perimeter(self.coach.posBall):
+                        action.defense(self.postureProxy,self.motionProxy,10)
 
         elif gamePhase == Phase.Penalized:
-            print "penalized"
             # RED COLOR
             self.ledProxy.fadeListRGB('ChestLeds', [0x00FF0000], [0])
             time.sleep(40)
@@ -223,12 +267,12 @@ class Robot(threading.Thread):
 
         #If ball is lost return 0
         if (self._analyse._ballAreaBottom != -1):
-            return 0
+            return False
         #If ball is at feet return 1
         elif (self._analyse._ballGridLocationBottom == [3,1] or
                self._analyse._ballGridLocationBottom ==[3,2]
         ):
-            return 1
+            return True
 
 #******************     TEST Robot    *********************#
 
