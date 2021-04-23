@@ -171,6 +171,9 @@ class Ui_MainWindow:
         self.resetButton.setText(_translate("MainWindow", "Reset", None))
 
     def eventUI(self):
+        """
+        contains all of the widget event
+        """
         self.exit.clicked.connect(self.close)
         self.addButton.clicked.connect(self.add)
         self.readyButton.clicked.connect(self.takeReady)
@@ -181,23 +184,39 @@ class Ui_MainWindow:
         self.kickOffButton.clicked.connect(self.kickoffIsOn)
 
     def start(self):
+        """
+        start the timer
+        """
         self.coach.timer.setup(self)
         self.coach.timer.start()
 
     def stop(self):
+        """
+        stop the timer
+        """
         self.coach.timer.stop()
 
     def reset(self):
+        """
+        reset the timer
+        """
         self.coach.timer.reset()
 
     def close(self):
+        """
+        stop all threads
+        """
         self.coach.stopThreads()
         self.app.quit()
 
     def connectRobot(self,ip,role):
+        """
+        allows to ask the connection and update view
+        """
         self.ip = ip.encode('ascii','ignore')
         self.role = role.encode('ascii','ignore')
 
+        # verify if the connection are allowed
         if self.coach.createPlayer(self.ip,self.role):
             item = QtGui.QListWidgetItem(self.listWidget)
             self.listWidget.addItem(item)
@@ -214,6 +233,9 @@ class Ui_MainWindow:
             self.errorWindow()
 
     def add(self):
+        """
+        display the window who allows to add robot
+        """
         self.addRobot = QtGui.QWidget()
         self.addRobotWindow = AddRobot()
         self.addRobotWindow.setupUi(self.addRobot,self.listIp,self.listRole)
@@ -222,6 +244,9 @@ class Ui_MainWindow:
         self.addRobot.show()
 
     def errorWindow(self):
+        """
+        display the error window
+        """
         self.error = QtGui.QWidget()
         errorWindow = Error()
         errorWindow.setupUi(self.error)
@@ -229,15 +254,23 @@ class Ui_MainWindow:
         self.error.show()
 
     def disconnect(self):
-        selectedIp = self.listWidget.itemWidget(self.listWidget.currentItem()).ip
-        selectedRole = self.listWidget.itemWidget(self.listWidget.currentItem()).role
+        """
+        ask to disconnect a robot
+        """
+        qWidget = self.listWidget.itemWidget(self.listWidget.currentItem())
+        selectedIp = qWidget.ip
+        selectedRole = qWidget.role
         if self.coach.stopThread(selectedIp):
             self.listIpConnected.remove(selectedIp)
             self.listIp.append(selectedIp)
             self.listRoleChoose.remove(selectedRole)
             self.listRole.append(selectedRole)
+            self.listWidget.removeItemWidget(self.listWidget.currentItem())
 
     def kickoffIsOn(self):
+        """
+        change the kickoff variable
+        """
         if self.kickOffButton.isChecked():
             
             self.coach.kickoff = True
@@ -245,9 +278,15 @@ class Ui_MainWindow:
             self.coach.kickoff = False
 
     def takeReady(self):
+        """
+        change states of robot to be ready
+        """
         self.coach.ready()
 
 class MyCustomWidget(QtGui.QWidget):
+    """
+    Custom widget to list ip and role
+    """
     def __init__(self, ip, role, parent=None):
         super(MyCustomWidget, self).__init__(parent)
         self.ip = ip
@@ -257,7 +296,10 @@ class MyCustomWidget(QtGui.QWidget):
         self.row.addWidget(QtGui.QLabel(role))
         self.setLayout(self.row)
 
+#******************     TEST Interface    *********************#
+
 if __name__ == "__main__":
+    import Coach as coach
     listIp = ["127.0.0.1 ","172.96.26.32","172.96.26.33","172.96.26.34","172.96.26.35","172.96.26.36"]
     listRole = ["GOAL","RDEFENSE","LDEFENSE","RATTACKER","LATTACKER","MIDDLE"]
     ui = Ui_MainWindow(listRole,listIp,coach.Coach())

@@ -39,19 +39,27 @@ class Robot(threading.Thread):
             self.analyse = Analyse(self.ip,PORT)
 
     def stop(self):
+        """
+        stop threads
+        """
         self.arretthread = True
 
     def trace(self, frame, event, arg):
+        """
+        force stoping
+        """
         if event=='line':
             if self.arretthread:
                 raise SystemExit()
         return self.trace
 
     def run(self):
+        """
+        run thread
+        """
         if self.running:
             try:
                 sys.settrace(self.trace)
-                action.danse(self.postureProxy,self.motionProxy)
                 self.IA(Phase.Initial)
                 self.IA(Phase.Ready)
 
@@ -61,7 +69,7 @@ class Robot(threading.Thread):
 
     def connectProxy(self,module):
         """
-        allows to connect the robot
+        make a connection proxy to the robot
         """
         try:
             
@@ -79,22 +87,19 @@ class Robot(threading.Thread):
 
     def IA(self,gamePhase):
         """
-        is the decisions in game of the robot
+        decision per phase of robot
         """
+
         if gamePhase == Phase.Initial:
             # BLUE COLOR
-            print "robot initial"
             self.ledProxy.fadeListRGB('ChestLeds', [0x000000ff], [0])
-            time.sleep(5)
             # declare his actual position as his origin/home (function)
             #action.posturePlay()
             self.IA(Phase.Set)
 
         elif gamePhase == Phase.Set:
             # YELLOW COLOR
-            print "robot set"
             self.ledProxy.fadeListRGB('ChestLeds', [0x00f5bb19], [0])
-            time.sleep(5)
             if self.coach.kickoff:
                 if self.role == Role.LATTACKER:
                     pass
@@ -104,14 +109,12 @@ class Robot(threading.Thread):
                     pass
                     #action.moveTo(Role[1])
             # turn to be in front of the enemy goal
-            #action.turn(self.motionProxy,50)
+            #action.turn(self.motionProxy,degresOfTurn)
             while not self.ready:
                 continue
 
         elif gamePhase == Phase.Ready:
-            print "robot ready"
-            time.sleep(5)
-            action.danse(self.postureProxy,self.motionProxy)
+            #action.danse(self.postureProxy,self.motionProxy)
             # wait sonor signal
             # coach.playing
             while True:
@@ -120,9 +123,7 @@ class Robot(threading.Thread):
 
         elif gamePhase == Phase.Playing:
             # GREEN COLOR
-            print "robot playing"
             self.ledProxy.fadeListRGB('ChestLeds', [0x0000ff00], [0])
-            time.sleep(5)
             if self.coach.kickoff:
                 if self.role == Role.LATTACKER:
                     print "attaque"
@@ -165,7 +166,6 @@ class Robot(threading.Thread):
 
         #The robot and head face the ball
         Action.turnBodyToHeadAngle(self._motionProxy)
-
 
     def moveToBall(self):
         """
@@ -230,6 +230,7 @@ class Robot(threading.Thread):
         ):
             return 1
 
+#******************     TEST Robot    *********************#
 
 if __name__ == "__main__":
 

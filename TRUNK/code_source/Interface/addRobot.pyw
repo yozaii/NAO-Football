@@ -1,12 +1,5 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'addRobot.ui'
-#
-# Created: Sun Apr  4 20:03:02 2021
-#      by: PyQt4 UI code generator 4.10
-#
-# WARNING! All changes made in this file will be lost!
-
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtCore import SIGNAL
 
@@ -119,6 +112,8 @@ class AddRobot(object):
     
     def close(self):
         self.addRobot.close()
+
+#******************     TEST addRobot    *********************#
 
 if __name__ == "__main__":
     import sys

@@ -1,6 +1,3 @@
-#------------------------#
-#    Enumeration/node    #
-#------------------------#
 from enum import Enum
 
 class Point2D:
@@ -159,6 +156,3 @@ def distance(posE1,posE2):
         """
 
         return sqrt(pow(posE2.get_x() - posE1.get_x() ,2) + pow(posE2.get_y() - posE1.get_y() ,2))
-
-if __name__ == "__main__":
-    pass

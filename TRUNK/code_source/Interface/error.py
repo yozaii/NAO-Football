@@ -63,6 +63,7 @@ class Error(object):
         self.label.setText(_translate("Form", "Error: we can\'t connect to the NAO proxy.", None))
         self.label_3.setText(_translate("Form", " Please check the Robot is switched on", None))
 
+#******************     TEST Error    *********************#
 
 if __name__ == "__main__":
     import sys

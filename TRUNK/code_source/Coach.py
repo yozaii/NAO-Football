@@ -9,6 +9,9 @@ import time
 from Interface.interface import Ui_MainWindow
 
 class Timer(threading.Thread):
+    """
+    timer of the soccer game
+    """
     def __init__(self):
         threading.Thread.__init__(self)
         self.sec = 0
@@ -40,8 +43,6 @@ class Timer(threading.Thread):
 class Coach:
     """ 
     class who dictates who need to do what and making decision about the game
-    Argument:
-    Variable:
     """
     def __init__(self):
 
@@ -57,6 +58,7 @@ class Coach:
         """
         create an instance of robot
         """
+        # give role
         if role == "GOAL":
             robot = ROBOT.Robot(ip,Role.GOAL,self.strat,self)
         elif role == "RDEFENSE":
@@ -69,12 +71,16 @@ class Coach:
             robot = ROBOT.Robot(ip,Role.LATTACKER,self.strat,self)
         elif role == "MIDDLE":
             robot = ROBOT.Robot(ip,Role.MIDDLE,self.strat,self)
+        # add thread to the listRobot
         self.listRobot.append(robot)
+        # start thread
         robot.start()
         return robot.running
 
     def ready(self):
-        # remplis sa liste de distance
+        """
+        make ready all robots on list
+        """
         for robot in self.listRobot:
             robot.ready = True
 
@@ -94,11 +100,19 @@ class Coach:
                 self.posBall = tpl[0].posBall
 
     def stopThreads(self):
+        """
+        stop all threads
+        """
         for robot in self.listRobot:
             robot.stop()
         self.timer.stop()
 
     def stopThread(self,ip):
+        """
+        stop a robot threads
+        Argument:
+        ip -- ip of robot who must stop
+        """
         for robot in self.listRobot:
             if ip == robot.ip:
                 robot.stop()
@@ -161,29 +175,6 @@ class Coach:
                 index = i
 
         return listRobot[index]
-
-    def ballPass(self,listEnemyRobot,listAllyRobot,posBall,robotPasser):
-        """
-        allows to make a good pass
-        listEnemyRobot -- the list of enemy robot
-        """
-        listAllyRobot.remove(robotPasser)
-        perimeterBall = PerimeterSquare(posBall)
-
-        for i in range(5):
-            perimeterRobot = PerimeterSquare(listAllyRobot[i].get_pos())
-            f = AffineFunction(perimeterBall.get_topLeft(),perimeterRobot.get_topLeft())
-            g = AffineFunction(perimeterBall.get_topRight(),perimeterRobot.get_topRight())
-            h = AffineFunction(perimeterBall.get_botLeft(),perimeterRobot.get_botLeft())
-            i = AffineFunction(perimeterBall.get_botRight(),perimeterRobot.get_botRight())
-            listFunction = bestFunction(f,g,h,i)
-            # boucle pour les ennemies
-            for j in range(5):
-                if isPresent(listFun[0],listFun[1],listEnemyRobot[j]):
-                    break;
-            
-
-        # must return list of robot that i can pass the ball
     
     def get_listRole(self):
         return self.__listeRole
@@ -237,6 +228,5 @@ class test(unittest.TestCase):
         self.assertEqual(self.f.get_b(),1)
 
 if __name__ == '__main__':
-    testDistribRole(Coach())
     unittest.main()
     
