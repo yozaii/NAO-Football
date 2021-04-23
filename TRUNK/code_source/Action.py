@@ -462,15 +462,10 @@ def shootFromChoregraphe(motionProxy):
 if __name__ == "__main__":
 
     IP = "127.0.0.1"
-    #IP = "172.27.96.34"
     PORT = 9559
     motionProxy = connect("ALMotion")
     postureProxy = connect("ALRobotPosture")
     navigationProxy = connect("ALNavigation")
-    #testWalk(motionProxy, postureProxy)
-    #moveTo2D(postureProxy,motionProxy)
-    #moveToo(postureProxy,motionProxy)
-    navigation(motionProxy,postureProxy,navigationProxy)
 
 
 
