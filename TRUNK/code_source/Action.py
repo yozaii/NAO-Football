@@ -3,21 +3,7 @@ import time
 import math
 import motion
 from naoqi import ALProxy
-<<<<<<< .mine
 import almath
-||||||| .r81
-import almath 
-IP = "127.0.0.1"
-#IP = "172.27.96.34"
-#IP = "169.254.199.241"
-PORT = 9559
-=======
-#import almath 
-IP = "127.0.0.1"
-#IP = "172.27.96.34"
-#IP = "169.254.199.241"
-PORT = 9559
->>>>>>> .r86
 
 def connect(module):
     """
@@ -485,4 +471,6 @@ if __name__ == "__main__":
     #moveTo2D(postureProxy,motionProxy)
     #moveToo(postureProxy,motionProxy)
     navigation(motionProxy,postureProxy,navigationProxy)
+
+
 
