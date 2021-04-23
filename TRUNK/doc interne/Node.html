@@ -1,0 +1,342 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module Node</title>
+<meta charset="utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>Node</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:///C:/users/a_yac/desktop/code_source/node.py">c:\users\a_yac\desktop\code_source\node.py</a></font></td></tr></table>
+    <p></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="Node.html#AffineFunction">AffineFunction</a>
+</font></dt><dt><font face="helvetica, arial"><a href="Node.html#PerimeterSquare">PerimeterSquare</a>
+</font></dt><dt><font face="helvetica, arial"><a href="Node.html#Point2D">Point2D</a>
+</font></dt><dt><font face="helvetica, arial"><a href="enum.html#Enum">enum.Enum</a>(<a href="__builtin__.html#object">__builtin__.object</a>)
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="Node.html#Element">Element</a>
+</font></dt><dt><font face="helvetica, arial"><a href="Node.html#Phase">Phase</a>
+</font></dt><dt><font face="helvetica, arial"><a href="Node.html#Role">Role</a>
+</font></dt><dt><font face="helvetica, arial"><a href="Node.html#Strategy">Strategy</a>
+</font></dt></dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="AffineFunction">class <strong>AffineFunction</strong></a></font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Affine&nbsp;function<br>
+Argument:<br>
+a&nbsp;--&nbsp;point&nbsp;of&nbsp;courbe<br>
+b&nbsp;--&nbsp;point&nbsp;of&nbsp;courbe<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="AffineFunction-__init__"><strong>__init__</strong></a>(self, a, b)</dt></dl>
+
+<dl><dt><a name="AffineFunction-bestFunction"><strong>bestFunction</strong></a>(self, f, g, h, i)</dt><dd><tt>return&nbsp;the&nbsp;distance&nbsp;between&nbsp;two&nbsp;function<br>
+Argument:<br>
+f&nbsp;--&nbsp;affine&nbsp;Function<br>
+g&nbsp;--&nbsp;affine&nbsp;Function<br>
+h&nbsp;--&nbsp;affine&nbsp;Function<br>
+i&nbsp;--&nbsp;affine&nbsp;Function</tt></dd></dl>
+
+<dl><dt><a name="AffineFunction-get_a"><strong>get_a</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="AffineFunction-get_b"><strong>get_b</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="AffineFunction-get_x"><strong>get_x</strong></a>(self, y)</dt></dl>
+
+<dl><dt><a name="AffineFunction-get_y"><strong>get_y</strong></a>(self, x)</dt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Element">class <strong>Element</strong></a>(<a href="enum.html#Enum">enum.Enum</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt><a href="#Element">Element</a>&nbsp;of&nbsp;court<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="Node.html#Element">Element</a></dd>
+<dd><a href="enum.html#Enum">enum.Enum</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>ALLY</strong> = 2</dl>
+
+<dl><dt><strong>BALL</strong> = 1</dl>
+
+<dl><dt><strong>CAGES</strong> = 4</dl>
+
+<dl><dt><strong>ENEMY</strong> = 3</dl>
+
+<dl><dt><strong>__order__</strong> = 'BALL ALLY ENEMY CAGES'</dl>
+
+<hr>
+Methods inherited from <a href="enum.html#Enum">enum.Enum</a>:<br>
+<dl><dt><a name="Element-__contains__"><strong>__contains__</strong></a>(self, value)</dt></dl>
+
+<dl><dt><a name="Element-__delattr__"><strong>__delattr__</strong></a>(self, name)</dt></dl>
+
+<dl><dt><a name="Element-__delitem__"><strong>__delitem__</strong></a>(self, index)</dt></dl>
+
+<dl><dt><a name="Element-__getitem__"><strong>__getitem__</strong></a>(self, index)</dt></dl>
+
+<dl><dt><a name="Element-__init__"><strong>__init__</strong></a>(self, *keys, **kwargs)</dt><dd><tt>Create&nbsp;an&nbsp;enumeration&nbsp;instance.</tt></dd></dl>
+
+<dl><dt><a name="Element-__iter__"><strong>__iter__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Element-__len__"><strong>__len__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Element-__setattr__"><strong>__setattr__</strong></a>(self, name, value)</dt></dl>
+
+<dl><dt><a name="Element-__setitem__"><strong>__setitem__</strong></a>(self, index, value)</dt></dl>
+
+<hr>
+Data descriptors inherited from <a href="enum.html#Enum">enum.Enum</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="PerimeterSquare">class <strong>PerimeterSquare</strong></a></font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="PerimeterSquare-__init__"><strong>__init__</strong></a>(self, pos, x, tl, tr, bl, br)</dt></dl>
+
+<dl><dt><a name="PerimeterSquare-get_botLeft"><strong>get_botLeft</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="PerimeterSquare-get_botRight"><strong>get_botRight</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="PerimeterSquare-get_topLeft"><strong>get_topLeft</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="PerimeterSquare-get_topRight"><strong>get_topRight</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="PerimeterSquare-perimeter"><strong>perimeter</strong></a>(self, pos)</dt><dd><tt>allows&nbsp;to&nbsp;know&nbsp;if&nbsp;the&nbsp;pos&nbsp;is&nbsp;on&nbsp;the&nbsp;perimeter</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Phase">class <strong>Phase</strong></a>(<a href="enum.html#Enum">enum.Enum</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>game&nbsp;phase<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="Node.html#Phase">Phase</a></dd>
+<dd><a href="enum.html#Enum">enum.Enum</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>Finished</strong> = 6</dl>
+
+<dl><dt><strong>Initial</strong> = 1</dl>
+
+<dl><dt><strong>Penalized</strong> = 5</dl>
+
+<dl><dt><strong>Playing</strong> = 4</dl>
+
+<dl><dt><strong>Ready</strong> = 3</dl>
+
+<dl><dt><strong>Set</strong> = 2</dl>
+
+<dl><dt><strong>__order__</strong> = 'Initial Set Playing Penalized Finished'</dl>
+
+<hr>
+Methods inherited from <a href="enum.html#Enum">enum.Enum</a>:<br>
+<dl><dt><a name="Phase-__contains__"><strong>__contains__</strong></a>(self, value)</dt></dl>
+
+<dl><dt><a name="Phase-__delattr__"><strong>__delattr__</strong></a>(self, name)</dt></dl>
+
+<dl><dt><a name="Phase-__delitem__"><strong>__delitem__</strong></a>(self, index)</dt></dl>
+
+<dl><dt><a name="Phase-__getitem__"><strong>__getitem__</strong></a>(self, index)</dt></dl>
+
+<dl><dt><a name="Phase-__init__"><strong>__init__</strong></a>(self, *keys, **kwargs)</dt><dd><tt>Create&nbsp;an&nbsp;enumeration&nbsp;instance.</tt></dd></dl>
+
+<dl><dt><a name="Phase-__iter__"><strong>__iter__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Phase-__len__"><strong>__len__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Phase-__setattr__"><strong>__setattr__</strong></a>(self, name, value)</dt></dl>
+
+<dl><dt><a name="Phase-__setitem__"><strong>__setitem__</strong></a>(self, index, value)</dt></dl>
+
+<hr>
+Data descriptors inherited from <a href="enum.html#Enum">enum.Enum</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Point2D">class <strong>Point2D</strong></a></font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>2d&nbsp;point<br>
+Argument:<br>
+x&nbsp;--&nbsp;x&nbsp;coordonnee<br>
+y&nbsp;--&nbsp;y&nbsp;coordonnee<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Point2D-__init__"><strong>__init__</strong></a>(self, x, y)</dt></dl>
+
+<dl><dt><a name="Point2D-get_x"><strong>get_x</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Point2D-get_y"><strong>get_y</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Point2D-set_x"><strong>set_x</strong></a>(self, x)</dt></dl>
+
+<dl><dt><a name="Point2D-set_y"><strong>set_y</strong></a>(self, y)</dt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Role">class <strong>Role</strong></a>(<a href="enum.html#Enum">enum.Enum</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>player&nbsp;role<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="Node.html#Role">Role</a></dd>
+<dd><a href="enum.html#Enum">enum.Enum</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>GOAL</strong> = ('GOAL', &lt;Node.Point2D instance&gt;)</dl>
+
+<dl><dt><strong>LATTACKER</strong> = ('LATTACKER', &lt;Node.Point2D instance&gt;, &lt;Node.Point2D instance&gt;)</dl>
+
+<dl><dt><strong>LDEFENSE</strong> = ('LDEFENSE', &lt;Node.Point2D instance&gt;)</dl>
+
+<dl><dt><strong>MIDDLE</strong> = ('MIDDLE', &lt;Node.Point2D instance&gt;)</dl>
+
+<dl><dt><strong>RATTACKER</strong> = ('RATTACKER', &lt;Node.Point2D instance&gt;)</dl>
+
+<dl><dt><strong>RDEFENSE</strong> = ('RDEFENSE', &lt;Node.Point2D instance&gt;)</dl>
+
+<dl><dt><strong>__order__</strong> = 'GOAL RDEFENSE LDEFENSE RATTACKER LATTACKER MIDDLE'</dl>
+
+<hr>
+Methods inherited from <a href="enum.html#Enum">enum.Enum</a>:<br>
+<dl><dt><a name="Role-__contains__"><strong>__contains__</strong></a>(self, value)</dt></dl>
+
+<dl><dt><a name="Role-__delattr__"><strong>__delattr__</strong></a>(self, name)</dt></dl>
+
+<dl><dt><a name="Role-__delitem__"><strong>__delitem__</strong></a>(self, index)</dt></dl>
+
+<dl><dt><a name="Role-__getitem__"><strong>__getitem__</strong></a>(self, index)</dt></dl>
+
+<dl><dt><a name="Role-__init__"><strong>__init__</strong></a>(self, *keys, **kwargs)</dt><dd><tt>Create&nbsp;an&nbsp;enumeration&nbsp;instance.</tt></dd></dl>
+
+<dl><dt><a name="Role-__iter__"><strong>__iter__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Role-__len__"><strong>__len__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Role-__setattr__"><strong>__setattr__</strong></a>(self, name, value)</dt></dl>
+
+<dl><dt><a name="Role-__setitem__"><strong>__setitem__</strong></a>(self, index, value)</dt></dl>
+
+<hr>
+Data descriptors inherited from <a href="enum.html#Enum">enum.Enum</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Strategy">class <strong>Strategy</strong></a>(<a href="enum.html#Enum">enum.Enum</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>game&nbsp;strategy<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="Node.html#Strategy">Strategy</a></dd>
+<dd><a href="enum.html#Enum">enum.Enum</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>DEFAULT</strong> = 1</dl>
+
+<dl><dt><strong>ULTRA_DEFENSE</strong> = 3</dl>
+
+<dl><dt><strong>ULTRA_OFFENSE</strong> = 2</dl>
+
+<dl><dt><strong>__order__</strong> = 'DEFAULT ULTRA_OFFENSE ULTRA_DEFENSE'</dl>
+
+<hr>
+Methods inherited from <a href="enum.html#Enum">enum.Enum</a>:<br>
+<dl><dt><a name="Strategy-__contains__"><strong>__contains__</strong></a>(self, value)</dt></dl>
+
+<dl><dt><a name="Strategy-__delattr__"><strong>__delattr__</strong></a>(self, name)</dt></dl>
+
+<dl><dt><a name="Strategy-__delitem__"><strong>__delitem__</strong></a>(self, index)</dt></dl>
+
+<dl><dt><a name="Strategy-__getitem__"><strong>__getitem__</strong></a>(self, index)</dt></dl>
+
+<dl><dt><a name="Strategy-__init__"><strong>__init__</strong></a>(self, *keys, **kwargs)</dt><dd><tt>Create&nbsp;an&nbsp;enumeration&nbsp;instance.</tt></dd></dl>
+
+<dl><dt><a name="Strategy-__iter__"><strong>__iter__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Strategy-__len__"><strong>__len__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Strategy-__setattr__"><strong>__setattr__</strong></a>(self, name, value)</dt></dl>
+
+<dl><dt><a name="Strategy-__setitem__"><strong>__setitem__</strong></a>(self, index, value)</dt></dl>
+
+<hr>
+Data descriptors inherited from <a href="enum.html#Enum">enum.Enum</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-distance"><strong>distance</strong></a>(posE1, posE2)</dt><dd><tt>allows&nbsp;to&nbsp;calculate&nbsp;the&nbsp;distance&nbsp;between&nbsp;two&nbsp;point3D<br>
+Argument:<br>
+posE1&nbsp;--&nbsp;Position&nbsp;(<a href="#Point2D">Point2D</a>)&nbsp;of&nbsp;the&nbsp;element&nbsp;1<br>
+posE2&nbsp;--&nbsp;Position&nbsp;(<a href="#Point2D">Point2D</a>)&nbsp;of&nbsp;the&nbsp;element&nbsp;2</tt></dd></dl>
+</td></tr></table>
+</body></html>
