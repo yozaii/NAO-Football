@@ -1,18 +1,30 @@
 #-*- coding: utf-8 -*-
-import time
+import time 
 import math
 import motion
 from naoqi import ALProxy
+<<<<<<< .mine
+import almath
+||||||| .r81
+import almath 
+IP = "127.0.0.1"
+#IP = "172.27.96.34"
+#IP = "169.254.199.241"
+PORT = 9559
+=======
 #import almath 
 IP = "127.0.0.1"
 #IP = "172.27.96.34"
 #IP = "169.254.199.241"
 PORT = 9559
+>>>>>>> .r86
 
 def connect(module):
     """
-    allows to connect the robot
+    "module" is the name of the API of Nao that we need to make it connect.
+    allows to connect the robot.
     Create a proxy to ALMotion and ALRobotPosture.
+    
     """
     try:
         return ALProxy(module, IP, PORT)
@@ -21,16 +33,24 @@ def connect(module):
         print "Error was: ",e
 
 def stiffnessOn(module):
+    """"module" is the name of the API of Nao that we need to make it connect.
+    This function allows to get stiffness in on mode.
+
+    """
     # We use the "Body" name to signify the collection of all joints
     pNames = "Body"
     pStiffnessLists = 1.0
     pTimeLists = 1.0
+    # Gets stiffness on
     module.stiffnessInterpolation(pNames, pStiffnessLists, pTimeLists)
 
 def danse(postureProxy, motionProxy):
     """
     This function makes the robot danse.
+    "postureProxy" is allows Nao to use "ALRobotPosture" API
+    "motionProxy" allows Nao to use "ALMotion" API
     """
+    # Go to standInit position
     postureProxy.goToPosture("StandInit", 2)
     footStepsList = [] 
     # 1) Step forward with your left foot
@@ -72,42 +92,37 @@ def danse(postureProxy, motionProxy):
     motionProxy.rest()
    
 def defense(postureProxy, motionProxy, timeGiven):
+    """This function allows the robot to sit down to defend.
+    We take the parameters that allow the robot to move 
+    and  "timeGime" is the time we need for it to remain seated.
+    "postureProxy" is allows Nao to use "ALRobotPosture" API.
+    "motionProxy" allows Nao to use "ALMotion" API.
+    """
+    #go to sit posture
     postureProxy.goToPosture("Sit", 5)
+    #stay as long as given
     time.sleep(timeGiven)
     # Send NAO to Pose Init
     postureProxy.goToPosture("StandInit", 5)
-
-def shoot(postureProxy, motionProxy):
-    """
-    #The robot shoots in the ball.
-    """
-    # Send NAO to Pose Init
-
-    postureProxy.goToPosture("StandInit", 0.5)
-    stiffnesses  = 1
-    isAbsolute  = False
-    #here the robot puts its foot back
-    names = ["LHipRoll","LAnkleRoll"]
-    angleLists = [math.radians(-5),math.radians(15)]
-    timeLists = [1.0,1.0]
-    motionProxy.setStiffnesses(names, stiffnesses)
-    motionProxy.angleInterpolation(names, angleLists, timeLists, isAbsolute)
-
-
-    postureProxy.goToPosture("Stand", 0.5)
     
 def simpleShoot(postureProxy, motionProxy):
     """
-    this function is a the movement of a little shoot for Nao
+    this function is a the movement of a little shoot for Nao.
+    He takes a step forward.
+    "postureProxy" is allows Nao to use "ALRobotPosture" API.
+    "motionProxy" allows Nao to use "ALMotion" API.
     """
-    # Send NAO to Pose Init
+    # Send NAO to Pose StandInit
     postureProxy.goToPosture("StandInit", 2)
-
+    #Loop that allows you to start the steps several times
     footStepsList = [] 
+    #Step forward with your left foot
     footStepsList.append([["LLeg"], [[0.12, 0.00, 0.0]]])
-    footStepsList.append([["LLeg"], [[-0.01, 0.00, 0.0]]])
-    stepFrequency = 1
+    footStepsList.append([["LLeg"], [[-0.01, 0.00, 0.0]]]) 
+    #Send Foot step
+    stepFrequency = 1 #defined the number of cycle to make
     clearExisting = False
+    #Loop that allows you to start the steps several times
     for j in range( 1 ):
         for i in range( len(footStepsList) ):
             try:
@@ -124,14 +139,21 @@ def simpleShoot(postureProxy, motionProxy):
     postureProxy.goToPosture("StandInit", 2)   
 
 def leftSideShoot(postureProxy, motionProxy):
+    """The robot shoot on the left side
+    "postureProxy" is allows Nao to use "ALRobotPosture" API.
+    "motionProxy" allows Nao to use "ALMotion" API.
+    """
     # Send NAO to Pose Init
     postureProxy.goToPosture("StandInit", 2)
 
     footStepsList = [] 
+    #Sidestep to the left with your left foot
     footStepsList.append([["LLeg"], [[0.00, 0.16, 0.0]]])
     footStepsList.append([["LLeg"], [[0.00, -0.16, 0.0]]])
-    stepFrequency = 0.2
+    #Send Foot step
+    stepFrequency = 0.2 #defined the number of cycle to make
     clearExisting = False
+    #Loop that allows you to start the steps several times
     for j in range( 1 ):
         for i in range( len(footStepsList) ):
             try:
@@ -146,16 +168,23 @@ def leftSideShoot(postureProxy, motionProxy):
                 exit()
     # Send NAO to Pose Init
     postureProxy.goToPosture("StandInit", 2)   
-    
+
 def rightSideShoot(postureProxy, motionProxy):
+    """ The robot shoot on the right side
+    "postureProxy" is allows Nao to use "ALRobotPosture" API.
+    "motionProxy" allows Nao to use "ALMotion" API.
+    """
     # Send NAO to Pose Init
     postureProxy.goToPosture("StandInit", 2)
 
     footStepsList = [] 
+    #Sidestep to the right with your right foot
     footStepsList.append([["RLeg"], [[0.00, -0.16, 0.0]]])
     footStepsList.append([["RLeg"], [[0.00, 0.16, 0.0]]])
+    #Send Foot step
     stepFrequency = 1
     clearExisting = False
+    #Loop that allows you to start the steps several times
     for j in range(1):
         for i in range( len(footStepsList) ):
             try:
@@ -172,63 +201,96 @@ def rightSideShoot(postureProxy, motionProxy):
     # Send NAO to Pose Init
     postureProxy.goToPosture("StandInit", 2)
 
-def postureDeJeu(postureProxy, motionProxy):
-    """
-    The posture that should have the robot.
-    """
-    motionProxy.moveInit()
-    postureProxy.goToPosture("StandInit", 2)
-    stiffnesses  = 1
-    isAbsolute  = False
-    names = ["LElbowRoll","RElbowRoll","LShoulderRoll","RShoulderRoll"]
-    angleLists = [math.radians(36.2),math.radians(-36.2),math.radians(-10),math.radians(10)]
-    timeLists = [1.0,1.0,1.0,1.0]
-    motionProxy.setStiffnesses(names, stiffnesses)
-    motionProxy.angleInterpolation(names, angleLists, timeLists, isAbsolute)
-
 def turn(motionProxy, degree):
     """
     The robot has to turn at a certain numbre of degres.
-    theta give the right number to turn nao at a certain degres
+    degree is the value you want the robot to spin
+    "motionProxy" allows Nao to use "ALMotion" API.
     """ 
+    # theta give the right number to turn nao at a certain degree
     theta = (((math.pi)/2) * degree) / 90
-    x = 0
-    y = 2
+    x = 0 #The robot does not move forward
+    y = 0 #The robot does not move to the side
+    #Nao moves
     motionProxy.moveTo(x, y, theta)
 
 def standby(postureProxy):
     """
     The robot stays and does nothing.
+    "postureProxy" is allows Nao to use "ALRobotPosture" API.
     """
+    # Send NAO to Pose Init
+    postureProxy.goToPosture("StandInit", 2)
+    # NAO stops mouving
     postureProxy.stopMove()
 
 def get_up(postureProxy):
     """
     Nao gets up.
+    "postureProxy" is allows Nao to use "ALRobotPosture" API.
     """
+    #Nao get to StandInit position
     postureProxy.goToPosture("StandInit", 2)
 
 def walk(motionProxy,x,y,theta ):
     """
     The robot walks.
-    x(m)
-    y(m)
-    theta(degree)
+    x(m).
+    y(m).
+    theta(degree).
+    "motionProxy" allows Nao to use "ALMotion" API.
     """
     motionProxy.moveTo(x, y, theta)
+    #Nao get to Init move
     motionProxy.moveInit()
+    
+    #Nao get to StandInit position
     postureProxy.goToPosture("StandInit", 0.5)
 
-def walkFaster(motionProxy, postureProxy):
+def navigation(motionProxy,postureProxy,navigationProxy, x, y,z):
+    """Makes the robot navigate to a relative metrical target pose2D expressed.
+    The robot computes a path to avoid obstacles.
+    Works only if Nao finds obstacles
+    "postureProxy" is allows Nao to use "ALRobotPosture" API.
+    "motionProxy" allows Nao to use "ALMotion" API.
+    "navigationProxy" allows Nao to use "ALNavigation" API.
+    """
+    # Send robot to Stand Init
+    postureProxy.goToPosture("StandInit", 0.5)
+
+    # Scanning the environement.
+    motionProxy.startFreeZoneUpdate()
+
+    # Add here an animation with timelines and moves (less than 60 seconds).  
+    motionProxy.moveTo(x, y, z * math.pi)
+    ###########################################################################
+    desiredRadius = 0.6
+    displacementConstraint = 0.5
+    result = navigationProxy.findFreeZone(desiredRadius, displacementConstraint)
+
+    errorCode = result[0]
+    if errorCode != 1:
+        worldToCenterFreeZone = almath.Pose2D(result[2][0], result[2][1], 0.0)
+        worldToRobot = almath.Pose2D(motionProxy.getRobotPosition(True))
+        robotToFreeZoneCenter = almath.pinv(worldToRobot) * worldToCenterFreeZone
+        motionProxy.moveTo(robotToFreeZoneCenter.x, robotToFreeZoneCenter.y, 0.0)
+    else :
+        print "Problem during the update of the free zone."
+
+def walkFaster(motionProxy, postureProxy, x,y,z):
+    """ This function makes Nao walk faster than the other function "walk".
+    postureProxy is allows Nao to use "ALRobotPosture" API.
+    motionProxy allows Nao to use "ALMotion" API.
+    """
     # Set NAO in Stiffness On
     stiffnessOn(motionProxy)
 
-    # Send NAO to Pose Init
+    # Send NAO to Pose StandInit
     postureProxy.goToPosture("StandInit", 0.5)
     # TARGET VELOCITY
-    X         = 1.0
-    Y         = 0.0
-    Theta     = 0.0
+    X         = x
+    Y         = y
+    Theta     = z
     Frequency = 1.0
 
     # Default walk (MaxStepX = 0.04 m)
@@ -240,89 +302,14 @@ def walkFaster(motionProxy, postureProxy):
     motionProxy.setWalkTargetVelocity(X, Y, Theta, Frequency, [["MaxStepX", 0.06]])
     time.sleep(4.0)
     print "walk Speed X :",motionProxy.getRobotVelocity()[0]," m/s"
-    """
-    # stop walk on the next double support
-    motionProxy.stopMove()
-    """
-
-def testWalk(motionProxy, postureProxy):
-    # Set NAO in stiffness On
-    stiffnessOn(motionProxy)
-
-    # first we defined the goal
-    goal = m.Pose2D(0.0, -0.4, 0.0)
-
-    # We get the dubins solution (control points) by
-    # calling an almath function
-
-    circleRadius = 0.04
-    # Warning : the circle use by dubins curve
-    #           have to be 4*CircleRadius < norm(goal)
-    dubinsSolutionAbsolute = m.getDubinsSolutions(goal, circleRadius)
-
-    # moveTo With control Points use relative commands but
-    # getDubinsSolution return absolute position
-    # So, we compute dubinsSolution in relative way
-    dubinsSolutionRelative = []
-    dubinsSolutionRelative.append(dubinsSolutionAbsolute[0])
-    for i in range(len(dubinsSolutionAbsolute)-1):
-        dubinsSolutionRelative.append(
-                dubinsSolutionAbsolute[i].inverse() *
-                dubinsSolutionAbsolute[i+1])
-
-    # create a vector of moveTo with dubins Control Points
-    moveToTargets = []
-    for i in range(len(dubinsSolutionRelative)):
-        moveToTargets.append(
-            [dubinsSolutionRelative[i].x,
-             dubinsSolutionRelative[i].y,
-             dubinsSolutionRelative[i].theta] )
-
-    # Initialized the Move process and be sure the robot is ready to move
-    # without this call, the first getRobotPosition() will not refer to the position
-    # of the robot before the move process
-    motionProxy.moveInit()
-
-    # get robot position before move
-    robotPositionBeforeCommand  = m.Pose2D(motionProxy.getRobotPosition(False))
-    motionProxy.moveTo( moveToTargets )
-    print "position : ", robotPositionBeforeCommand
-
-    # get robot position after move
-    robotPositionAfterCommand = m.Pose2D(motionProxy.getRobotPosition(False))
-
-    # compute and print the robot motion
-    robotMoveCommand = m.pose2DInverse(robotPositionBeforeCommand)*robotPositionAfterCommand
-    print "The Robot Move Command: ", robotMoveCommand
-
-def coup(motionProxy, postureProxy):
-
-    #motionProxy.wakeUp()
-   # Send NAO to Pose Init
-
-    postureProxy.goToPosture("StandInit", 0.5)
-    stiffnesses  = 1
-    isAbsolute  = False
-    #here the robot puts its foot back
-    names = ["LHipRoll","RHipPitch","RAnklePitch"]
-    angleLists = [math.radians(15),math.radians(30),math.radians(-10)]
-    timeLists = [1.0,1.0,1.1]
-    motionProxy.setStiffnesses(names, stiffnesses)
-    motionProxy.angleInterpolation(names, angleLists, timeLists, isAbsolute)
-    # the robot shoots
-    names = ["RKneePitch","RHipPitch","RAnklePitch"]
-    angleLists = [math.radians(5),math.radians(-50),math.radians(10)]
-    timeLists = [0.8,0.6,1.0]
-    motionProxy.setStiffnesses(names, stiffnesses)
-    motionProxy.angleInterpolation(names, angleLists, timeLists, isAbsolute)
-
-    names = ["RKneePitch","RHipPitch","RAnklePitch","LHipRoll"]
-    angleLists = [math.radians(5),math.radians(-15),math.radians(0),math.radians(-15)]
-    timeLists = [0.8,0.6,1.0,1,1,1]
-    motionProxy.setStiffnesses(names, stiffnesses)
-    motionProxy.angleInterpolation(names, angleLists, timeLists, isAbsolute)
     
 def contournBall(motionProxy, postureProxy, degree):
+    """When the robot will need to move around the ball to position itself correctly.
+    degree is the number of degree that makes 1 cycle ( 3 cycle makes nao turn to 180 degree).
+    postureProxy is allows Nao to use "ALRobotPosture" API.
+    motionProxy allows Nao to use "ALMotion" API.
+    """
+    #Nao get to StandInit posture
     postureProxy.goToPosture("StandInit", 2)
     footStepsList = [] 
     # 1) Step forward with your left foot
@@ -346,8 +333,8 @@ def contournBall(motionProxy, postureProxy, degree):
     ###############################
     stepFrequency = 0.8
     clearExisting = False
-    nbStep= 9# defined the number of cycle to make
-    for j in range( nbStep):
+    # defined the number of cycle to make
+    for j in range(degres):
         for i in range( len(footStepsList) ):
             try:
                 motionProxy.setFootStepsWithSpeed(
@@ -364,10 +351,17 @@ def contournBall(motionProxy, postureProxy, degree):
     motionProxy.rest()
 
 def shootFromChoregraphe(motionProxy):
+    """this function makes the robot shooting in the ball.
+    The movement was mimed on Choregraphe then exported in python langauge.
+    motionProxy allows Nao to use "ALMotion" API.
+    """
     # Choregraphe simplified export in Python.
     names = list()
     times = list()
     keys = list()
+
+    #We get a list of names of joints, time and keys of movement.
+    #For each movement, this allows the robot's articulation to be moved according to the time and degree of articulation desired.
 
     names.append("HeadPitch")
     times.append([0.2, 0.36, 0.6, 1.04, 1.2, 1.44, 1.6])
@@ -474,73 +468,21 @@ def shootFromChoregraphe(motionProxy):
     keys.append([0.0475121, 0.0475121, 0.0433513, 0.0433513, 0.0475121, 0.0475121, 0.0433513])
     
     motionProxy.angleInterpolation(names, keys, times, True)
-   
-def moveTo(postureProxy,motionProxy):
 
-    # Send robot to Pose Init
-    postureProxy.goToPosture("StandInit", 2)
-    # Example showing how to get a simplified robot position in world.
-    useSensorValues = False
-    result = motionProxy.getRobotPosition(useSensorValues)
-    print("Robot Position", result)
-    # Example showing how to use this information to know the robot's diplacement.
-    useSensorValues = False
-    initRobotPosition = almath.Pose2D(motionProxy.getRobotPosition(useSensorValues))
-    # Make the robot move
-    motionProxy.moveTo(0.1, 0.0, 0.2)
-    endRobotPosition = almath.Pose2D(motionProxy.getRobotPosition(useSensorValues))
-    # Compute robot's' displacement
-    robotMove = almath.pose2DInverse(initRobotPosition)*endRobotPosition
-    print("Robot Move:", robotMove)
 
-def moveToo(postureProxy,motionProxy):
-
-    # Send NAO to Pose Init
-    postureProxy.goToPosture("StandInit", 0.5)
-
-    # Example showing how to get a simplified robot position in world.
-    result = motionProxy.getRobotPosition()
-    print "Next Robot Position", result
-
-    # Example showing how to use this information to know the robot's diplacement
-    # during the move process.
-
-    # Make the robot move
-    motionProxy.moveTo(0.1, 0.0, 0.1, _async=True) # No blocking due to post called
-    time.sleep(1.0)
-    initRobotPosition = almath.Pose2D(motionProxy.getNextRobotPosition())
-
-    # Make the robot move
-    motionProxy.moveTo(0.0, 0.0, 0.0)
-
-    endRobotPosition = almath.Pose2D(motionProxy.getNextRobotPosition())
-
-    # Compute robot's' displacement
-    robotMove = almath.pose2DInverse(initRobotPosition)*endRobotPosition
-    print "Robot Move :", robotMove
-    result = motionProxy.getNextRobotPosition()
-    print "Next Robot Position", result
 
 
 
 if __name__ == "__main__":
 
+    IP = "127.0.0.1"
+    #IP = "172.27.96.34"
+    PORT = 9559
     motionProxy = connect("ALMotion")
     postureProxy = connect("ALRobotPosture")
-    #postureProxy.goToPosture("StandInit", 2)
-    #time.sleep(2)
-    #danse(postureProxy, motionProxy)
-    #get_up(postureProxy)
-    #turn(motionProxy, 0)
-    #walk(motionProxy,0.2,0,0)
-    #postureDeJeu(postureProxy, motionProxy)
-    #coup(motionProxy, postureProxy)
-    #shoot(postureProxy,motionProxy)
-    #leftSideShoot(postureProxy, motionProxy)
-    #rightSideShoot(postureProxy, motionProxy)
-    #simpleShoot(postureProxy, motionProxy) 
-    #defense(postureProxy, motionProxy, 0.1)
-    #walkFaster(motionProxy, postureProxy)
-    #contournBall(motionProxy, postureProxy, 0)
-    #shootFromChoregraphe(motionProxy)
-    moveTo(postureProxy,motionProxy)
+    navigationProxy = connect("ALNavigation")
+    #testWalk(motionProxy, postureProxy)
+    #moveTo2D(postureProxy,motionProxy)
+    #moveToo(postureProxy,motionProxy)
+    navigation(motionProxy,postureProxy,navigationProxy)
+
