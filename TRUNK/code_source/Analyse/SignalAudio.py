@@ -1,10 +1,11 @@
 from subprocess import check_output
 import numpy
 import sys 
+import unittest
 
 class SignalAudio:
     def __init__(self):
-        self.__sample_rate = 48000 
+        self.__sample_rate = 48000 # KHz of the .wav file from robot NAO
         self.__fingerprint_source = [] # original whistle sound digitalized
         self.__fingerprint_target = [] # sound receive by the robot digitalized
 
@@ -27,15 +28,15 @@ class SignalAudio:
         """
         Initialise the sound receive by the robot (target) and the original whistle sound (source)
         """
-        self.__fingerprint_source = self.calculate_fingerprints(source)
-        self.__fingerprint_target = self.calculate_fingerprints(target)
+        self.__fingerprint_source = self.__calculate_fingerprints(source)
+        self.__fingerprint_target = self.__calculate_fingerprints(target)
 
-        corr = self.compare(self.__fingerprint_source, self.__fingerprint_target)
-        max_corr_offset = self.get_max_corr(corr, source, target)
+        corr = self.__compare(self.__fingerprint_source, self.__fingerprint_target)
+        max_corr_offset = self.__get_max_corr(corr, source, target)
 
         return max_corr_offset
     
-    def calculate_fingerprints(self, filename):
+    def __calculate_fingerprints(self, filename):
         """
         The audio file is digitized into a list of integer after being sampled at a particular sample rate
         """
@@ -53,7 +54,7 @@ class SignalAudio:
         
         return fingerprints
 
-    def correlation(self, listx, listy):
+    def __correlation(self, listx, listy):
         """
         We do not directly compare all the fingerprints of listx and listy. We compare corresponding fingerprints in both lists.
         If the difference between fingerprint (covariance) bits is unto 1, it is safe to assume that the fingerprints are similar.
@@ -74,7 +75,7 @@ class SignalAudio:
         
         return covariance/32
 
-    def cross_correlation(self, listx, listy, offset):
+    def __cross_correlation(self, listx, listy, offset):
         """
         Return cross correlation, with listy offset from listx
         """
@@ -89,9 +90,9 @@ class SignalAudio:
             # Error checking in main program should prevent us from ever being able to get here.
             return None
         #raise Exception('Overlap too small: %i' % min(len(listx), len(listy)))
-        return self.correlation(listx, listy)
+        return self.__correlation(listx, listy)
 
-    def compare(self, listx, listy):
+    def __compare(self, listx, listy):
         """
         Cross correlate listx and listy with offsets from -span to span
         """
@@ -102,10 +103,10 @@ class SignalAudio:
                             + 'Reduce span, reduce crop or increase sample_time.')
         corr_xy = []
         for offset in numpy.arange(-self.__span, self.__span + 1, self.__step):
-            corr_xy.append(self.cross_correlation(listx, listy, offset))
+            corr_xy.append(self.__cross_correlation(listx, listy, offset))
         return corr_xy
 
-    def max_index(self, listx):
+    def __max_index(self, listx):
         """
         Return index of maximum value in list
         """
@@ -117,11 +118,13 @@ class SignalAudio:
                 max_index = i
         return max_index
   
-    def get_max_corr(self, corr, source, target):
+    def __get_max_corr(self, corr, source, target):
         """
-        Return the result of the match
+        Return the result of the match.
+        If True then the sound source is similar to the target audio source.
+        Else return False then the sound source is not similar to the target audio source
         """
-        max_corr_index = self.max_index(corr)
+        max_corr_index = self.__max_index(corr)
         max_corr_offset = -self.__span + max_corr_index * self.__step
         print "max_corr_index = ", max_corr_index, "max_corr_offset = ", max_corr_offset
         # report matches
@@ -130,10 +133,51 @@ class SignalAudio:
                 % (source, target, corr[max_corr_index], max_corr_offset)) 
             return True
         else:
-            print "The covariance is under 0.5, it seem that is not the same sound"
+            print ("The covariance is %.4f < 0.5, it seem that is not the same sound"%(corr[max_corr_index]))
             return False
 
-"""
-s1 = SignalAudio()
-s1.correlate("whistle-3sec.wav","Dog-test.wav")
-"""
+class TestSignalAudio(unittest.TestCase):
+
+    def test_correlate_return_true(self):
+        """
+        Test the correlation with the exactly same audio
+        """
+        s1 = SignalAudio()
+
+        self.assertTrue(s1.correlate("whistle-3sec.wav","whistle-3sec.wav"))
+
+    def test_correlate_return_true2(self):
+        """
+        Test the correlation with 2 different audios with similarity
+        """
+        s1 = SignalAudio()
+
+        self.assertTrue(s1.correlate("whistle-3sec.wav","other_whistle.wav"))
+
+    def test_correlate_return_false(self):
+        """
+        Test the correlation with 2 different audios with no similarity
+        """
+        s1 = SignalAudio()
+
+        self.assertFalse(s1.correlate("whistle-3sec.wav","Dog-test.wav"))
+
+    def test_correlate_RaisesIllegalArguments(self):
+        """
+        Raise an exception for the correlate method when I pass illegals arguments
+        """
+        s1 = SignalAudio()
+
+        self.assertRaises(Exception, s1.correlate, ("je veux une erreur de parametre", None, "Erreur"))
+
+    def test_correlate_with_no_arguments(self):
+        """
+        Raise an exception for the correlate method when I pass no arguments to the function
+        """
+        s1 = SignalAudio()
+
+        self.assertRaises(Exception, s1.correlate)
+
+if __name__ == "__main__":
+
+    unittest.main()

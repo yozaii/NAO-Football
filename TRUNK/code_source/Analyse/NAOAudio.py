@@ -119,10 +119,6 @@ class NAOAudio:
         return self.__port
 
 class TestNAOAudio(unittest.TestCase):
-    """
-    def setUp(self):
-        return super(NAOAudio, self).setUp()
-    """
 
     def test_Instance_Of_RobotAudio_without_arguments(self):
         """
@@ -244,31 +240,3 @@ class TestNAOAudio(unittest.TestCase):
 if __name__ == "__main__":
 
     unittest.main()
-
-"""
-robot = NAOAudio("172.27.96.33", 9559)
-
-robot.connectToALDeviceAudio()
-
-
-robot.startRecording()
-
-time.sleep(15)
-
-robot.stopRecording()
-
-#Access to the file NAO and download the specied file in the current desktop folder
-cmd = 'scp nao@172.27.96.33:/home/nao/recordRobot.wav .' 
-os.system(cmd)
-
-signal = SignalAudio()
-
-robot.setSpeakerVolume()
-
-#if the covariance is greater then 0.5, then it's a whistle and the robot say it
-if signal.correlate("whistle-3sec.wav", "recordRobot.wav"):
-    robot.speak()
-    danse(robot.postureProxy, robot.motionProxy)
-else:
-    robot.speak("it seem that is not a whistle audio !")
-"""

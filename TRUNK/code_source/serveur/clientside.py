@@ -66,7 +66,7 @@ class Client:
         """
         return socket.gethostbyname(socket.gethostname())
 
-#-------------------------------------- Test connection to the robot -------------------------------------------------
+#-------------------------------------- Tests connection to the robot -------------------------------------------------
 
 def testConnectionToRobotWithQi_Application():
     app = qi.Application(url="tcp://172.27.96.32:9559") #Connection to the robot with his IP and port
@@ -99,7 +99,7 @@ def testConnectionToRobotWithALConnectionManager():
     networkProxy = ALProxy("ALConnectionManager", "172.27.96.32", 9559) #Connect the module ALConnectionManager with the robot
     networkProxy.connect()
 
-#-------------------------------------- Test Client -------------------------------------------------
+#-------------------------------------- Tests Client -------------------------------------------------
 c1 = Client()
 c2 = Client()
 
@@ -124,10 +124,9 @@ def testSend_message():
 def testListening():
     """
     test the listening of clients
-    Maybe use thread for not blocked the programm
+    Use this function with thread for not blocked the programm
     """
     c1.listening()
-    c2.listening()
 
 def testDisconnection():
     """
@@ -136,29 +135,76 @@ def testDisconnection():
     c1.disconnection()
     c2.disconnection()
 
-#-------------------------------------- Test Unitaires -------------------------------------------------
+#-------------------------------------- Tests Unitaires -------------------------------------------------
 class TestClient(unittest.TestCase):
-    def setUp(self):
-        self.c1 = Client()
-        self.c2 = Client()
-        return super().setUp()
 
+    #--------------- Tests with errors ---------------#
     def test_connection_RaisesConnectionRefusedError(self):
-        self.assertRaises(Exception, self.c1.connection)
+        """
+        Raise an exception for the connection methode when the server is not lunched
+        """
+        c1 = Client()
+
+        self.assertRaises(Exception, c1.connection)
     
     def test_connection_RaisesIllegalArguments(self):
-        self.assertRaises(Exception, self.c1.connection, "je veux une erreur de paramètre")
+        """
+        Raise an exception for the connection methode when I pass illegals arguments
+        """
+        c1 = Client()
 
-    def test_send_message_isNone(self):
-        self.assertIsNone(self.c1.send_message)
-        
+        self.assertRaises(Exception, c1.connection, "je veux une erreur de paramètre")
+
     def test_send_message_RaisesIllegalArguments(self):
-        self.assertRaises(Exception, self.c1.send_message, (None, 2, "je veux une erreur de paramètre"))
+        """
+        Raise an exception for the send_message methode when I pass illegals arguments
+        """
+        c1 = Client()
+
+        self.assertRaises(Exception, c1.send_message, (None, 2, "je veux une erreur de paramètre"))
 
     def test_disconnection_RaisesIllegalArguments(self):
-        self.assertRaises(Exception, self.c1.disconnection, ("je veux une erreur de paramètre"))
+        """
+        Raise an exception for the disconnection methode when I pass illegals arguments
+        """
+        c1 = Client()
+
+        self.assertRaises(Exception, c1.disconnection, ("je veux une erreur de paramètre"))
 
     def test_listening_RaisesIllegalArguments(self):
-        self.assertRaises(Exception, self.c1.listening, ("je veux une erreur de paramètre"))
+        """
+        Raise an exception for the listening methode when I pass illegals arguments
+        """
+
+        c1 = Client()
+
+        self.assertRaises(Exception, c1.listening, ("je veux une erreur de paramètre"))
+
+    #--------------- Tests without errors ---------------#
+    def test_send_message_isNone(self):
+        """
+        return nothing for the send_message methode, everything ok.
+        """
+        c1 = Client()
+        c1.connection()
+
+        self.assertIsNone(c1.send_message)
+    
+    def test_connection_isNone(self):
+        """
+        return nothing for the connection methode, everything ok.
+        """
+        c1 = Client()
+
+        self.assertIsNone(c1.connection)
+
+    def test_disconnection_isNone(self):
+        """
+        return nothing for the disconnection methode, everything ok.
+        """
+        c1 = Client()
+
+        self.assertIsNone(c1.disconnection)
+
 if __name__ == "__main__":
     unittest.main()
