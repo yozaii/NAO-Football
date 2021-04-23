@@ -3,7 +3,6 @@ import sys
 import threading
 from naoqi import ALProxy
 import Action as action
-#from serveur.clientside import Client
 from Analyse.Analyse import *
 from Node import *
 import time
