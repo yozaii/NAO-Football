@@ -50,8 +50,8 @@ class Analyse :
 
 
         #Connects to top and bottom video cameras
-        self._vision._subscribeToVideoProxy(0)
-        self._vision._subscribeToVideoProxy(1)
+        #self._vision._subscribeToVideoProxy(0)
+        #self._vision._subscribeToVideoProxy(1)
 
     def _updateBallInfo(self, img, xml, CameraID):
         """
@@ -141,37 +141,49 @@ class Analyse :
 
         #If ball is seen
         else:
-            #Ball is een aroudn the top of the TopImage
+
+            #realBallPixelSize is the real size of the ball converted from mm to pixels.
+            #Its value is not precise, wasn't able to test
+            realBallPixelSize = 500
+
+            #Focal length in mm
+            focalLength = 300
+
+            #Image taken length in pixels
+            if (self._ballHeightBottom == -1):
+                imageLength =  self._ballHeightTop
+
+            else : imageLength = self._ballHeightBottom
+
+
+            distance = focalLength * realBallPixelSize / imageLength
+
+            #Ball is seen around the top of the TopImage
             if self._ballGridLocationTop[1] == 0:
-                #ratio allows us to find a more precise approximation
-                #of the distance to the ball
-                #ratio = self._ballHeightTop
-                self._distanceToBall = 4
+                self._distanceToBall = 4 + distance
 
             elif self._ballGridLocationTop[1] == 1:
-                self._distanceToBall = 3
+                self._distanceToBall = 3 + distance
 
             elif self._ballGridLocationTop[1] == 2:
-                self._distanceToBall = 2
+                self._distanceToBall = 2 + distance
 
             elif self._ballGridLocationTop[1] == 3:
-                self._distanceToBall = 1
+                self._distanceToBall = 1 + distance
 
             #Ball is seen around the top of TopImage
             elif self._ballGridLocationBottom[1] == 0:
 
-                self._distanceToBall = 1
+                self._distanceToBall = 1 + distance
 
             elif self._ballGridLocationBottom[1] == 1:
-                self._distanceToBall = 0.75
+                self._distanceToBall = 0.75 + distance
 
             elif self._ballGridLocationBottom[1] == 2:
-                self._distanceToBall = 0.5
+                self._distanceToBall = 0.5 + distance
 
             elif self._ballGridLocationBottom[1] == 3:
-                self._distanceToBall = 0.25
-
-
+                self._distanceToBall = 0.25 + distance
 
     def _updateGoalInfo(self, img):
         """
@@ -204,10 +216,10 @@ class Analyse :
             top = t/60
             bot = b/60
 
-            self._goalTopCenterGrid = [(left + right/2)][top]
-            self._goalLeftBaseGrid = [left][bot]
-            self._goalRightBaseGrid = [right][bot]
-            self._goalCenterGrid = [(left+right)/2][(top+bot)/2]
+            self._goalTopCenterGrid = [(left + right/2), top]
+            self._goalLeftBaseGrid = [left, bot]
+            self._goalRightBaseGrid = [right, bot]
+            self._goalCenterGrid = [(left+right)/2, (top+bot)/2]
 
     def _takeTopImage(self, xml):
         """
@@ -235,56 +247,69 @@ class Analyse :
         A boolean function to check if ball to the is visible or not
         :return: True if visible, False otherwise
         """
-        if self._ballGridLocationTop == -1 and self._ballCoordinatesBottom == -1:
+        if self._ballGridLocationTop == [-1,-1] and self._ballCoordinatesBottom == [-1,-1]:
             return False
         else:
             return True
 
 class TestAnalyse(unittest.TestCase):
 
-    def testUpdateBallGridLocation(self):
+    def testUpdateBallGridLocationTop(self):
         """
         Tests if BallGridLocation gets updated correctly
         """
         analyse = Analyse(IP,PORT)
-        self.assertEqual([2, 2],analyse._updateBallGridLocation(233, 172, 0))
+        analyse._updateBallGridLocation(233, 172, 0)
+        self.assertEqual([2, 2], analyse._ballGridLocationTop)
 
+    def testUpdateBallGridLocationBottom(self):
+        """
+        Tests if BallGridLocation gets updated correctly
+        """
+        analyse = Analyse(IP, PORT)
+        analyse._updateBallGridLocation(233, 172, 1)
+        self.assertEqual([2, 2], analyse._ballGridLocationBottom)
+
+    def testBallVisible(self):
+        analyse = Analyse(IP, PORT)
+
+        #should be false because ballGridLocation starts at -1 -1
+        bool1 = analyse._ballIsVisible()
+
+        analyse._ballGridLocationTop = [2,2]
+        bool2 = analyse._ballIsVisible()
+
+        self.assertEqual(True, not bool1 and bool2)
+
+    def testUpdateGoalGridLocation(self):
+
+        analyse = Analyse(IP, PORT)
+
+        l = 80
+        r = 80
+        t = 80
+        b = 80
+        analyse._updateGoalGridLocation(l,r,t,b)
+        bool1 = analyse._goalTopCenterGrid == [1,1]
+        bool2 = analyse._goalLeftBaseGrid == [1,1]
+        bool3 = analyse._goalRightBaseGrid == [1,1]
+        bool4 = analyse._goalCenterGrid == [1,1]
+
+        boolAll = bool1 and bool2 and bool3 and bool4
+
+        self.assertEqual(True, boolAll)
+
+    def testUpdateBallDistance(self):
+        analyse = Analyse(IP, PORT)
+        analyse._ballGridLocationTop[1] = 0
+        analyse._ballHeightTop = 30
+
+        analyse._updateDistanceToBall()
+        bool1 = analyse._distanceToBall >= 4
+        self.assertEqual(True, bool1)
 
 
 
 
 if __name__ == "__main__":
-    #unittest.main()
-
-    #Other tests below:
-    """Testing updateBallCoordinates
-    times = time.time()
-    img = cv2.imread('C:\\Users\\Youssef\\Desktop\\Robocup Images\\1.jpg',6)
-    xml = 'C:\\Users\\Youssef\\Downloads\\ball_cascade.xml'
-    analyse = Analyse(4,5,6)
-    analyse._updateBallCoordinates(img,xml)
-    print(analyse._getBallCoordinates())
-    print(time.time()-times)"""
-
-
-    #Testing imageCapture on top camera
-    time.sleep(3)
-    xml = 'C:\\Users\\Youssef\\Downloads\\ball_cascade.xml'
-    analyse = Analyse(IP, 9559)
-
-    print(analyse._vision._videoProxy.getSubscribers())
-    #analyse._vision._unsubscribeAll()
-
-    naoimg = analyse._takeTopImage(xml)
-    #naoimg2 = analyse._takeBottomImage(xml)
-    cv2.imshow('naoimg',naoimg)
-
-
-    print("distance to ball", analyse._distanceToBall)
-    print("ball coordinates top", analyse._ballCoordinatesTop)
-
-    analyse._vision._unsubscribeAll()
-    print(analyse._vision._videoProxy.getSubscribers())
-
-    cv2.waitKey()
-    cv2.destroyAllWindows()
+    unittest.main()

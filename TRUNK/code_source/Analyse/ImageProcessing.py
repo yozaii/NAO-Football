@@ -9,9 +9,6 @@ img3 = cv2.imread('C:\\Users\\Youssef\\Desktop\\Robocup Images\\Goal3.jpg')
 img4 = cv2.imread('C:\\Users\\Youssef\\Desktop\\Robocup Images\\Goal4.jpg')
 img5 = cv2.imread('C:\\Users\\Youssef\\Desktop\\Robocup Images\\Goal5.jpg')
 img6 = cv2.imread('C:\\Users\\Youssef\\Desktop\\Robocup Images\\Goal6.jpg')
-ball2 = cv2.imread('C:\\Users\\Youssef\\Desktop\\Robocup Images\\Ball2.jpg')
-ball3 = cv2.imread('C:\\Users\\Youssef\\Desktop\\Robocup Images\\Ball3.jpg')
-ball4 = cv2.imread('C:\\Users\\Youssef\\Desktop\\Robocup Images\\football2.jfif')
 
 
 
@@ -106,27 +103,19 @@ class ImageProcessing :
             goalInfoList[4] = Area of goal
         """
         blueFilterImg = self.keepBlue(img)
-        cv2.imshow("after Blue filter",blueFilterImg)
-
         #Converts image to gray
         gray = cv2.cvtColor(blueFilterImg, cv2.COLOR_BGR2GRAY)
-        cv2.imshow("gray before", gray)
-
         #Blurs noise
         cv2.medianBlur(gray, 3, gray)
 
         #Threshold to keep only dark-ish objects
         ret, thresh = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY)
-        cv2.imshow('thresh',thresh)
-
         #Edges detection
         edges = cv2.Canny(thresh, 50, 150)
-        cv2.imshow('canny', edges)
 
         #Hough transform and resulting horizontal / vertical lines
         lines, points = self.houghOnGray(edges, 30)
         res, houghVPoints, houghHPoints = self.drawHoughLines(gray, lines)
-        cv2.imshow("res",res)
 
         #x coordinates of left and right posts
         leftAndRightPosts = self.findVerticalExtr(houghVPoints)
@@ -153,12 +142,8 @@ class ImageProcessing :
         goalInfoList[2] = y1 #Top post
         goalInfoList[3] = y2#Base of goal
         goalInfoList[4] = width * postLength#Area of rectangle
-        cv2.imshow("rectangle", img)
-        cv2.waitKey()
-        cv2.destroyAllWindows()
 
         return goalInfoList
-
 
     def houghOnGray(self, img, pointThresh):
         """
@@ -287,6 +272,78 @@ class TestImageProcessing(unittest.TestCase):
         ImPr = ImageProcessing()
         self.assertEqual(len(ImPr.findBallRectangle(img, xml)), 7)
 
+    def testFindBallRectangle(self):
+        ImPr = ImageProcessing()
+        im = img
+        bList = ImPr.findBallRectangle(im, xml)
+
+        #20 pixel margin of error for each except area (20*20 = 400)
+
+        if bList[0] <= 471 and bList[0] >= 431: xTopLeft = True
+        if bList[1] <= 372 and bList[1] >= 332: yTopLeft = True
+        if bList[2] <= 78 and bList[2] >= 38: width = True
+        if bList[3] <= 78 and bList[3] >= 38: height = True
+        if bList[4] <= 500 and bList[4] >= 460: xCenter = True
+        if bList[5] <= 401 and bList[5] >= 361: yCenter = True
+        if bList[6] <= 3764 and bList[6] >= 2964: area = True
+        [451, 352, 58, 58, 480, 381, 3364]
+
+        bool1 = xTopLeft and yTopLeft and width and height
+        bool2 = xCenter and yCenter and area
+        boolAll = bool1 and bool2
+
+        self.assertEqual(True, boolAll)
+
+    def testKeepBlue(self):
+        """
+        Fails if there are non-blue or non-white pixels
+        :return:
+        """
+        ImPr = ImageProcessing()
+        im = ImPr.keepBlue(img)
+        boolOnlyBlue = True
+        bool1 = True
+        bool2 = True
+        for i in range(im.shape[0]):
+            for j in range(im.shape[1]):
+                b = im[i][j][0]
+                g = im[i][j][1]
+                r = im[i][j][2]
+                if (r == 255 and g == 255 and b!= 255):
+                    bool1 = False
+                if (r > 50 or g > 100) and (b<30):
+                    bool2 = False
+        boolOnlyBlue = bool1 and bool2
+        self.assertEqual(True, boolOnlyBlue)
+
+    def testFindVerticalExtr(self):
+
+        ImPr = ImageProcessing()
+
+        point1 = np.array([[200, 115], [40, 300]])
+        point2 = np.array([[100, 100], [7, 45]])
+        point3 = np.array([[470, 88], [90, 200]])
+        point4 = np.array([[89, 153], [172, 233]])
+        points = [point1, point2, point3, point4]
+        pts = np.array(points)
+        res = ImPr.findVerticalExtr(pts)
+        bool1 = res[0] == 53
+        bool2 = res[1] == 280
+        boolAll = bool1 and bool2
+        self.assertEqual(True, boolAll)
+
+    def testFindHorizontalTop(self):
+        ImPr = ImageProcessing()
+
+        point1 = np.array([[200, 115], [40, 300]])
+        point2 = np.array([[100, 100], [7, 45]])
+        point3 = np.array([[470, 88], [90, 200]])
+        point4 = np.array([[89, 153], [172, 233]])
+        points = [point1, point2, point3, point4]
+        pts = np.array(points)
+        top = ImPr.findHorizontalTop(pts)
+        boolTop = top == 72
+        self.assertEqual(True, boolTop)
 
     def testGoalDetectionTwo(self):
         ImPr = ImageProcessing()
@@ -308,7 +365,6 @@ class TestImageProcessing(unittest.TestCase):
         boolAll = boolLeft and boolRight and boolTop and boolBot and boolArea
         self.assertEqual(True,boolAll)
 
-
     def testGoalDetectionThree(self):
         ImPr = ImageProcessing()
         boolLeft = False
@@ -328,7 +384,6 @@ class TestImageProcessing(unittest.TestCase):
 
         boolAll = boolLeft and boolRight and boolTop and boolBot and boolArea
         self.assertEqual(True, boolAll)
-
 
     def testGoalDetectionFour(self):
         ImPr = ImageProcessing()
@@ -350,7 +405,6 @@ class TestImageProcessing(unittest.TestCase):
         boolAll = boolLeft and boolRight and boolTop and boolBot and boolArea
         self.assertEqual(True, boolAll)
 
-
     def testGoalDetectionFive(self):
         ImPr = ImageProcessing()
         boolLeft = False
@@ -370,7 +424,6 @@ class TestImageProcessing(unittest.TestCase):
 
         boolAll = boolLeft and boolRight and boolTop and boolBot and boolArea
         self.assertEqual(True, boolAll)
-
 
     def testGoalDetectionSix(self):
         ImPr = ImageProcessing()
@@ -392,64 +445,6 @@ class TestImageProcessing(unittest.TestCase):
         boolAll = boolLeft and boolRight and boolTop and boolBot and boolArea
         self.assertEqual(True, boolAll)
 
-
-    def testRandom(self):
-        self.assertEqual(1,1)
-
 if __name__ == "__main__":
-    #unittest.main()
 
-    #Other tests below:
-    """
-    imPr = ImageProcessing()
-    imPr.findBallRectangle(img,xml)
-    cv2.imshow('img',img)
-    cv2.waitKey()
-    cv2.destroyAllWindows()
-    """
-
-    """
-    imPr = ImageProcessing()
-    gray = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
-    cv2.imshow("gray before", gray)
-    cv2.medianBlur(gray, 3, gray)
-    cv2.imshow("gray after blur", gray)
-    ret, thresh = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY)
-    edges = cv2.Canny(thresh, 50, 150)
-    cv2.imshow('thtresh', thresh)
-    cv2.imshow('edges', edges)
-    lines, points = imPr.houghOnGray(edges, 100)
-    res, houghVPoints = imPr.drawHoughLines(gray, lines, "Vertical")
-    print(houghVPoints)
-    minAndMax = imPr.findVerticalExtr(houghVPoints)
-    print(minAndMax)
-    cv2.imshow("hough", res)
-    cv2.waitKey()
-    """
-
-
-    img2 = cv2.resize(img2, (320,240))
-    img3 = cv2.resize(img3, (320,240))
-    img4 = cv2.resize(img4, (320,240))
-    img5 = cv2.resize(img5, (320,240))
-    img6 = cv2.resize(img6, (320,240))
-    ball2 = cv2.resize(ball2, (560,560))
-    ball3 = cv2.resize(ball3, (560,560))
-    #ball4 = cv2.resize(ball4, (560,560))
-
-
-
-    imPr = ImageProcessing()
-    """
-    two = imPr.findGoalRectangle(img2)
-    three = imPr.findGoalRectangle(img3)
-    four = imPr.findGoalRectangle(img4)
-    five = imPr.findGoalRectangle(img5)
-    six = imPr.findGoalRectangle(img6)
-    """
-    imPr.findBallRectangle(ball4, xml)
-
-    cv2.waitKey()
-
-
-
+    unittest.main()

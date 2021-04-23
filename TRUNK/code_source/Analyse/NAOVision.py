@@ -60,19 +60,6 @@ class NAOVision :
         elif (cameraID == 1):
             self._imgClientBottom = self._videoProxy.subscribeCamera("_clientBottom", cameraID,  resolution, colorSpace, 5)
 
-    def _unsubscribeToVideoProxy(self, cameraID):
-        """
-        Unregister our naoqi video module
-        cameraID = 0, unsubscribes from the top camera
-        cameraID = 1, unsubscribes from the bottom camera
-        """
-        if (cameraID == 0):
-            if self._imgClientTop != "":
-                self._videoProxy.unsubscribe(self._imgClientTop)
-        elif (cameraID == 1):
-            if self._imgClientBottom != "":
-                self._videoProxy.unsubscribe(self._imgClientBottom)
-
     def _unsubscribeAll(self):
         """
         Unregisters all naoqi video modules
@@ -142,42 +129,50 @@ class TestNAOVision(unittest.TestCase):
         nVis._unsubscribeAll()
 
 
-    def testTakeImageTopDimensions(self):
+    def testTakeImageTop(self):
         """
-        tests if dimensions are correct when taking an
-        image from top camera
+        tests if an image has been taken
+        from the top camera
         """
         nVis = NAOVision(IP, PORT)
         nVis._subscribeToVideoProxy(1)
         nVis._takeImage(0)
-        self.assertEqual(nVis._image.shape, (240L, 320L, 3L))
+        self.assertNotEquals(nVis._alImage, None)
         nVis._unsubscribeAll()
 
+    def testTakeImageBottom(self):
+        """
+        tests if an image has been taken
+        from the bottom camera
+        """
+        nVis = NAOVision(IP, PORT)
+        nVis._subscribeToVideoProxy(1)
+        nVis._takeImage(0)
+        self.assertNotEquals(nVis._alImage, None)
+        nVis._unsubscribeAll()
 
-    #def testTakeImageBottom(self):
+    def testUnsubscribeAll(self):
+        """
+        tests if the camera modules have been successfully
+        unsubscribed from the subscribers list
+        """
+        nVis = NAOVision(IP, PORT)
+        nVis._subscribeToVideoProxy(0)
+        nVis._unsubscribeAll()
+
+        #Testing for bottom client
+        boolB0 = "_clientBottom_0" in self._videoProxy.getSubscribers()
+
+        #Testing for top client
+        boolT0 = "_clientTop_0" in self._videoProxy.getSubscribers()
+
+        #Making sure that none of the two modules exist
+        boolAll = boolB0 and boolT0
+
+        #boolAll should return false if both modules
+        #don't exist in the subscribers list
+        self.assertEqual(boolAll, False)
 
 
 if __name__ == "__main__":
-    #unittest.main()
-
-
-    #Other tests below:
-
-    """
-    nVis = NAOVision(IP,PORT)
-    print(nVis._image.shape == (240L, 320L, 3L))
-    """
-
-    """
-    nVis = NAOVision(IP,9559)
-    nVis._subscribeToVideoProxy(1)
-    naoimg = nVis._takeImage(1)
-    print(nVis._videoProxy)
-    print(nVis._imgClientTop + 'Test')
-    nVis._unsubscribeToVideoProxy(0)
-    """
-
-    nVis = NAOVision(IP, PORT)
-    nVis._subscribeToVideoProxy(1)
-    img = nVis._takeImage(1)
-    cv2.imshow('img', img)
+    unittest.main()
